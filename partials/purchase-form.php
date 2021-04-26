@@ -1,4 +1,7 @@
 <div id="postbox">
+
+    <?php include __DIR__ . '/progress.php'; ?>
+
     <form id="purchase-form" name="purchase-form" method="post">
 
         <b-tabs v-model="activeTab">
@@ -61,26 +64,7 @@
         top: .5rem;
     }
 </style>
-<script>
-    jQuery(function JSInit(params) {
-        new Vue({
-            el: '#purchase-form',
-            data: ()=>({
-                letters: [{}],
-            }),
-            methods: {
-                addLetter(){
-                    this.letters.push({});
-                },
-                deleteLetter(i){
-                    this.letters.splice(i,1);
-                }
-            },
-            computed:{
-                price(){
-                    return 36;
-                }
-            }
-        });       
-    })
-</script>
+<?php
+
+
+?>

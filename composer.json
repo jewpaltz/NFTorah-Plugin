@@ -1,0 +1,25 @@
+{
+    "name": "root/nf-torah",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Moshe Plotkin",
+            "email": "mplotkin@jewpaltz.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+          "Ethereum\\": "src/"
+        }
+      },
+      "repositories": [
+        {
+          "type": "git",
+          "url": "https://github.com/digitaldonkey/ethereum-php.git"
+        }
+      ],
+      "require": {
+        "digitaldonkey/ethereum-php": "dev-master"
+      }
+}
