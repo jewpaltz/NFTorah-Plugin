@@ -47,7 +47,6 @@
 
         <?php wp_nonce_field( 'wps-frontend-post' ); ?>
 
-        <input type="submit" value="Purchase" id="submit" name="submit" class="is-large" />
     
     </form>
 </div>
@@ -63,6 +62,16 @@
         position: absolute;
         top: .5rem;
     }
+
+    .b-tabs section.tab-content {
+        padding: 0;
+    }
+    @media (max-width: 767px){
+        .entry-content-wrap {
+            padding: .5rem;
+        }       
+    }
+
 </style>
 <?php
 

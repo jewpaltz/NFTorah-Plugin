@@ -22,8 +22,11 @@
         </b-tab-item>
 
         <b-tab-item label="PayPal">
+            <p>
+                Once you complete the transaction in PayPal. You will be returned to this page to download your NFTs
+            </p>
             <b-button  type="is-success " size="is-large" expanded >
-                Continue to Paypal to complete transaction
+                Continue to Paypal
             </b-button>
         </b-tab-item>
 
