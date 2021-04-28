@@ -1,4 +1,4 @@
-<b-tabs type="is-toggle" size="is-large">
+<b-tabs type="is-toggle">
         <b-tab-item label="Credit Card">
             <b-field label="Card Number" label-position="inside">
                 <b-input v-model="cardNumber" id="cardNumber"></b-input>

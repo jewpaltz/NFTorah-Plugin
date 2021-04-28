@@ -1,8 +1,7 @@
+    <?php include __DIR__ . '/progress.php'; ?>
 <div id="postbox">
 
-    <?php include __DIR__ . '/progress.php'; ?>
-
-    <form id="purchase-form" name="purchase-form" method="post">
+    <form id="purchase-form" name="purchase-form" method="post" v-if="page == 1">
 
         <b-tabs v-model="activeTab">
             <b-tab-item label="Individual Letters">
@@ -49,6 +48,9 @@
 
     
     </form>
+    <div v-else-if="page == 2">
+        <?php include __DIR__ . '/download-nft.php'; ?>
+    </div>
 </div>
 <style>
     .columns:not(:last-child){
@@ -63,9 +65,28 @@
         top: .5rem;
     }
 
+    .field .control, .field .help {
+        margin: 0;
+    }
+
     .b-tabs section.tab-content {
         padding: 0;
     }
+
+    p.panel-heading {
+        font-size: 1.1em;
+        padding: .5em 1em;
+    }
+
+    .title {
+        margin-top: .5rem !important;
+        margin-bottom: 0 !important; 
+    }
+    .subtitle {
+        margin-top: 0 !important;
+        margin-bottom: .5rem !important;
+    }
+
     @media (max-width: 767px){
         .entry-content-wrap {
             padding: .5rem;

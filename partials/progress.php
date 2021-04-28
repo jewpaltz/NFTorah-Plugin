@@ -18,6 +18,7 @@
         letters purchased
     </div>
 </div>
+
 <style>
 .flat-progress {
     background: white;
@@ -52,3 +53,4 @@
     margin-right: 5px;
 }
 </style>
+

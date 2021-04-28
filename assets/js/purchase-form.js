@@ -1,5 +1,5 @@
 new Vue({
-    el: '#purchase-form',
+    el: '#postbox',
     data: ()=>({
         letters: [{}],
     }),
@@ -14,6 +14,12 @@ new Vue({
     computed:{
         price(){
             return this.letters.length;
+        },
+        page(){
+            return location.hash.includes("page2") ? 2 : 1;
+        },
+        a_letter(){
+            return this.letters.length == 1 ? "a letter" : this.letters.length + " letters"
         }
     }
 });       
