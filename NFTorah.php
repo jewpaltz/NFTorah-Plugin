@@ -24,6 +24,7 @@ register_activation_hook( __FILE__, ['NFTorah', 'Activate'] );
 register_deactivation_hook( __FILE__, ['NFTorah', 'Deactivate'] );
 add_action( 'init', ['NFTorah', 'Init'] );
 add_action( 'admin_init', ['NFTorah', 'AdminInit'] );
+add_action( 'rest_api_init', ['NFTorah', 'RestApiInit'] );
 add_action( 'admin_menu', ['NFTorah', 'AdminMenu'] );
 /**/
 //require_once plugin_dir_path( __FILE__ ) . 'admin/options_page.php';

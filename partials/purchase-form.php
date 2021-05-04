@@ -1,16 +1,15 @@
     <?php include __DIR__ . '/progress.php'; ?>
 <div id="postbox">
-
     <form id="purchase-form" name="purchase-form" method="post" v-if="page == 1">
 
-        <b-tabs v-model="activeTab">
-            <b-tab-item label="Individual Letters">
+        <b-tabs v-model="activeItemTab">
+            <b-tab-item label="Individual Letters" value="1">
                 <?php include __DIR__ . '/letters-form.php'; ?>
             </b-tab-item>
-            <b-tab-item label="Verses & Sections">
+            <b-tab-item label="Verses & Sections" value="2">
                 <h1>Buy an entire Verse or Parshah</h1>
             </b-tab-item>
-            <b-tab-item label="Special Sections">
+            <b-tab-item label="Special Sections" value="3">
                 <?php include __DIR__ . '/special-sections-form.php'; ?>
             </b-tab-item>
         </b-tabs>
@@ -25,20 +24,20 @@
         <div class="columns">
             <div class="column">
                 <b-field label="First Name" label-position="inside">
-                        <b-input v-model="firstName" id="firstName"></b-input>
+                        <b-input v-model="purchase.firstName" id="firstName"></b-input>
                     </b-field>
                 </div>
                 <div class="column">
                 <b-field label="Last Name" label-position="inside">
-                    <b-input v-model="billingName" id="billingName"></b-input>
+                    <b-input v-model="purchase.lastName" id="lastName"></b-input>
                 </b-field>
             </div>
         </div>
         <b-field label="Email" label-position="inside">
-            <b-input v-model="billingName" id="billingName"></b-input>
+            <b-input v-model="purchase.email" id="email"></b-input>
         </b-field>
         <b-field label="Phone" label-position="inside">
-            <b-input v-model="billingName" id="billingName"></b-input>
+            <b-input v-model="purchase.phone" id="phone"></b-input>
         </b-field>
 
         <?php include __DIR__ . '/payment-form.php'; ?>
