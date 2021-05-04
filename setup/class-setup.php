@@ -23,9 +23,9 @@ class NFTorah_setup {
                         ON UPDATE CURRENT_TIMESTAMP,
             firstName varchar(200) NOT NULL,
             lastName varchar(200) NOT NULL,
-            Email varchar(200) NOT NULL,
-            Phone varchar(200) NOT NULL,
-            Paid DECIMAL(13,2) NOT NULL,
+            email varchar(200) NOT NULL,
+            phone varchar(200) NOT NULL,
+            paid DECIMAL(13,2) NOT NULL,
             cardNumber varchar(200) NOT NULL,
             expirationDate varchar(200) NOT NULL,
             cvv varchar(5) NOT NULL,
@@ -63,6 +63,26 @@ class NFTorah_setup {
 
         $dbDelta_results = dbDelta( $sql );
         do_action( 'qm/debug', $dbDelta_results );
+        do_action( 'qm/debug', $wpdb->last_error );
+
+        update_option( "NFTorah_db_version", $DB_VERSION );
+    }
+
+    public static function update_003_allow_exp_and_cvv_null() {
+		global $wpdb;
+        $DB_VERSION = 1.31;
+
+        if((float)get_option('NFTorah_db_version') >= $DB_VERSION){
+            do_action( 'qm/debug', 'NFTorah DB structure Up To Date!' );
+            return;
+        }
+
+        $sql =  "ALTER TABLE {$wpdb->prefix}torah_purchase "
+            .   " MODIFY  expirationDate varchar(200) NULL, "
+            .   " MODIFY  cvv varchar(5) NULL ";
+
+        $wpdb->query($sql);
+
         do_action( 'qm/debug', $wpdb->last_error );
 
         update_option( "NFTorah_db_version", $DB_VERSION );

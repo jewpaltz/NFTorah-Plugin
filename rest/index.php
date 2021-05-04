@@ -6,6 +6,10 @@
     $controller = $_REQUEST['controller'];
     $action = $_REQUEST['action'];
 
+    $json = file_get_contents('php://input');
+
+    $data = json_decode($json);
+
     $conn = require('./connection.php');
 
 
@@ -15,7 +19,8 @@
     }
     switch ($controller) {
         case 'purchase':
-            
+            NFTorah::PurchaseFormSave($data->purchase, $data->letters);
+            echo 'Success';
             break;
         
         default:

@@ -1,0 +1,21 @@
+http://localhost:8001/wp-json/wp/v2/pages
+
+
+###
+POST http://localhost:8001/wp-json/NFTorah/v1/purchases?_wpnonce=838365499e
+Content-Type: application/json
+//X-WP-Nonce: 838365499e
+Referer: http://localhost:8001/purchase-a-letter/
+
+{
+    "hebrewName": "Moshe Nachum",
+    "lastName": "Plotkin",
+    "purchase": {
+        "email" : "mplotkin@jewpaltz.com"
+    },
+    "letters" : [
+        {
+            "mothersName" : "Shoshanah"
+        }
+    ]
+}
