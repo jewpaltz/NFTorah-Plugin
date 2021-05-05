@@ -1,17 +1,17 @@
 <b-tabs type="is-toggle" v-model="activePaymentTab">
         <b-tab-item label="Credit Card"  value="1">
             <b-field label="Card Number" label-position="inside">
-                <b-input v-model="purchase.cardNumber" id="cardNumber"></b-input>
+                <b-input v-model="purchase.cardNumber" id="cardNumber" :required="activePaymentTab == '1'"></b-input>
             </b-field>
             <div class="columns">
                 <div class="column">
                     <b-field label="Expiration Date" label-position="inside">
-                        <b-input v-model="purchase.expirationDate" id="expirationDate"></b-input>
+                        <b-input v-model="purchase.expirationDate" id="expirationDate" :required="activePaymentTab == '1'"></b-input>
                     </b-field>
                 </div>
                 <div class="column">
                     <b-field label="CVV" label-position="inside">
-                        <b-input v-model="purchase.cvv" id="cvv"></b-input>
+                        <b-input v-model="purchase.cvv" id="cvv" :required="activePaymentTab == '1'"></b-input>
                     </b-field>
                 </div>
             </div>
