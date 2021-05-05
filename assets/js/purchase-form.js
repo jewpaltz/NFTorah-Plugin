@@ -3,6 +3,9 @@ class Letter {
     secularName = "";
     lastName = "";
     mothersName = "";
+    hasOneFirstName(){
+        return this.hebrewName || this.secularName;
+    }
 }
 
 class Purchase {
@@ -15,15 +18,19 @@ class Purchase {
     cvv = null;
 }
 
-new Vue({
+const formVue = new Vue({
     el: '#postbox',
     data: ()=>({
         letters: [new Letter()],
         activeItemTab: "1",
         activePaymentTab: "1",
         isSaved: false,
-        purchase: new Purchase()
+        purchase: new Purchase(),
+        route: window.location.hash
     }),
+    mounted(){
+        
+    },
     methods: {
         addLetter(){
             this.letters.push(new Letter());
@@ -33,14 +40,33 @@ new Vue({
         },
         creditcard(){
             //  Charge Credit Card
-            this.submitForm();
+            this.trySubmitForm();
         },
         paypal(){
             //  Show Paypal UI
             this.purchase.cardNumber = "PayPal";
-            this.submitForm();
+            this.trySubmitForm();
+         },
+         trySubmitForm(){
+            if (this.isValid()) {
+                this.submitForm();
+              } else {
+                  for (const field of this.$refs.form) {
+                      if(field.blur){
+                          field.dispatchEvent(new Event('blur'));
+                      }
+                  }
+                this.$refs.form.reportValidity();
+              }
+         },
+         isValid(){
+            if(!this.$refs.form.checkValidity()){
+                return false;
+            }
+            return true;
          },
         async submitForm(){
+
             this.purchase.paid = this.price;
             const data = await  NFTorah_api('purchases', {
                 purchase: this.purchase,
@@ -49,6 +75,7 @@ new Vue({
             console.log({data});
 
             history.pushState(null, null, "#download-nft")
+            this.route = "#download-nft";
             this.isSaved = true;
 
         }
@@ -58,7 +85,7 @@ new Vue({
             return this.letters.length;
         },
         page(){
-            return location.hash.includes("download-nft")  ? //|| this.isSaved
+            return this.route.includes("download-nft")  ? //|| this.isSaved
                 2 :
                 1 ;
         },
@@ -68,3 +95,7 @@ new Vue({
     }
 });       
 
+
+window.addEventListener('hashchange', function() {
+    formVue.route = window.location.hash;
+  }, false);

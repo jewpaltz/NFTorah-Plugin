@@ -18,12 +18,12 @@
         <div class="columns"  style="margin: 0;">
             <div class="column" style="padding-top: 0; padding-bottom: .25rem;">
             <b-field label="Last Name"  label-position="inside" >
-                    <b-input v-model="letter.lastName" id="lastName"></b-input>
+                    <b-input v-model="letter.lastName" id="lastName" required></b-input>
                 </b-field>
             </div>
             <div class="column" style="padding-top: 0; padding-bottom: .25rem;">
                 <b-field  label="Mother's Name" label-position="inside" message="Hebrew if you know it, secular if you don't">
-                    <b-input v-model="letter.mothersName" id="mothersName"></b-input>
+                    <b-input v-model="letter.mothersName" id="mothersName" required></b-input>
                 </b-field>
             </div>
         </div>
