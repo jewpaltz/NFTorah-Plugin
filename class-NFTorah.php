@@ -55,7 +55,8 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
             require_once __DIR__ . '/partials/display-list.php';
         }
         public static function PurchaseFormHtml(){
-            wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css' );
+            wp_register_style( 'mdi-icons', 'https://cdn.jsdelivr.net/npm/@mdi/font@5.9.55/css/materialdesignicons.min.css' );
+            wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css', ['mdi-icons'] );
             wp_register_script( 'vue', 'https://unpkg.com/vue', [], '0.1', true );
             wp_register_script( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.js', ['vue'], '0.1', true );
             wp_register_script( 'my-fetch', plugins_url( '', __FILE__ ) . '/assets/js/myFetch.js', ['buefy'], '0.1', true );
