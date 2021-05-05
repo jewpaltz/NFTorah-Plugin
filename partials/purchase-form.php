@@ -1,6 +1,6 @@
     <?php include __DIR__ . '/progress.php'; ?>
 <div id="postbox">
-    <form id="purchase-form" name="purchase-form" method="post" v-if="page == 1">
+    <form id="purchase-form" ref="form" method="post" @submit.prevent="" v-if="page == 1">
 
         <b-tabs v-model="activeItemTab">
             <b-tab-item label="Individual Letters" value="1">
@@ -23,21 +23,21 @@
         <small><b>Information of person paying:</b></small>
         <div class="columns">
             <div class="column">
-                <b-field label="First Name" label-position="inside">
-                        <b-input v-model="purchase.firstName" id="firstName"></b-input>
+                <b-field label="First Name *" label-position="inside">
+                        <b-input v-model="purchase.firstName" id="firstName" required></b-input>
                     </b-field>
                 </div>
                 <div class="column">
-                <b-field label="Last Name" label-position="inside">
-                    <b-input v-model="purchase.lastName" id="lastName"></b-input>
+                <b-field label="Last Name *" label-position="inside">
+                    <b-input v-model="purchase.lastName" id="lastName" required></b-input>
                 </b-field>
             </div>
         </div>
-        <b-field label="Email" label-position="inside">
-            <b-input v-model="purchase.email" id="email"></b-input>
+        <b-field label="Email *" label-position="inside">
+            <b-input v-model="purchase.email" id="email" required></b-input>
         </b-field>
-        <b-field label="Phone" label-position="inside">
-            <b-input v-model="purchase.phone" id="phone"></b-input>
+        <b-field label="Phone *" label-position="inside">
+            <b-input v-model="purchase.phone" id="phone" required></b-input>
         </b-field>
 
         <?php include __DIR__ . '/payment-form.php'; ?>

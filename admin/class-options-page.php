@@ -13,7 +13,7 @@ class OptionsPage {
                 'NFTorah Options',
                 'manage_options',
                 'NFTorah',
-                ['OptionsPage', 'HTML'],
+                [__CLASS__, 'HTML'],
                 plugin_dir_url(__FILE__) . 'images/icon_wporg.png',
                 20
             );
@@ -22,7 +22,10 @@ class OptionsPage {
     }
 
     public static function HTML(){
-
+        wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css' );
+        $data = Purchases::GetList();
+        //print_r($data);
+        require_once __DIR__ . '/../partials/display-list.php';
     }
 
     public static function OnSubmit(){
@@ -31,12 +34,6 @@ class OptionsPage {
         }    
     }
 
-    public static function AddSettingsType(){
-     
-    }
 
-    public static function section_developers_html(){
- 
-    }
 
 }

@@ -2,6 +2,7 @@
 /*
     B"H
 */
+require_once __DIR__ . '/data/class-purchases.php';
 require_once __DIR__ . '/admin/class-options-page.php';
 require_once __DIR__ . '/setup/class-setup.php';
 require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
@@ -21,15 +22,13 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
             NFTorah_setup::update_001_create_original_tables();
             NFTorah_setup::update_003_allow_exp_and_cvv_null();
 
-            require_once __DIR__ . '/register_post_type.php';
-            NFTorah_register_post_type();
 
             self::RegisterPublicHooks();      
             do_action( 'qm/debug', 'NFTorah Initialized' );
         }
 
         public static function AdminInit(){
-            NFTorah\OptionsPage::AddSettingsType();
+
         }
 
         public static function RestApiInit(){
@@ -43,12 +42,18 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
 
         public static function RegisterPublicHooks(){
             add_shortcode( 'NFTorah_purchase_form', [__CLASS__, 'PurchaseFormHtml'] );
+            add_shortcode( 'NFTorah_purchase_list', [__CLASS__, 'PurchaseListHtml'] );
         }
 
         public static function RegisterAdminHooks(){
 
         }
 
+        public static function PurchaseListHtml(){
+            wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css' );
+            $data = NFTorah\Purchases::GetList();
+            require_once __DIR__ . '/partials/display-list.php';
+        }
         public static function PurchaseFormHtml(){
             wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css' );
             wp_register_script( 'vue', 'https://unpkg.com/vue', [], '0.1', true );
