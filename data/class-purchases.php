@@ -9,7 +9,18 @@ class Purchases{
     public static function GetList(){
         global $wpdb;
 
-        $data = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}torah_purchase"), 'ARRAY_A');
+        $data = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}torah_purchase ORDER BY id"), 'ARRAY_A');
+        $letters = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}torah_letter  ORDER BY purchase_id"), 'ARRAY_A');
+        $l_count = count($letters);
+        $l_index = 0;
+        foreach ($data as $key => $row) {
+            $data[$key]['letters'] = [];
+        //print_r($row);
+            while ($l_index < $l_count && $letters[$l_index]['purchase_id'] == $row['id']) {
+                $data[$key]['letters'][] = $letters[$l_index];
+                $l_index++;
+            }
+        }
         return $data;
     }
     public static function Create($purchase, $letters, $nonce){
