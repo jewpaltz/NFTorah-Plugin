@@ -1,5 +1,5 @@
     <?php include __DIR__ . '/progress.php'; ?>
-<div id="postbox">
+<div id="postbox" :class="{ loaded: true }">
     <form id="purchase-form" ref="form" method="post" @submit.prevent="" v-if="page == 1">
 
         <b-tabs v-model="activeItemTab">
@@ -50,8 +50,23 @@
     <div v-else-if="page == 2">
         <?php include __DIR__ . '/download-nft.php'; ?>
     </div>
+    <div class="noscript">
+        <article class="message is-danger" style="margin-top: 5px;">
+            <div class="message-body">
+                <h1 class="title is-4">Sorry, this website doesn't support your web browser.</h1>
+                <h2 class="subtitle is-4">Please try opening this site in chrome or on a desktop computer.</h2>
+            </div>
+        </article>
+    </div>
 </div>
+
 <style>
+    #postbox > *, #postbox > *, .loaded#postbox .noscript {
+        display: none;
+    }
+    .loaded#postbox > *, #postbox .noscript {
+        display: block;
+    }
     .columns:not(:last-child){
         margin-bottom: 0;
     }
