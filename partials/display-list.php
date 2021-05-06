@@ -3,6 +3,7 @@
     B"H
     Expects a variable named $data with the list to be displayed
 */?>
+<div class="table-container">
 <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
     <tr>
         <th>Name</th>
@@ -46,3 +47,4 @@
         </tr>
     <?php endforeach; ?>
 </table>
+</div>
