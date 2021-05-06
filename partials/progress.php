@@ -8,18 +8,22 @@
     $percent_done = (int) (($letters_purchased / $letters_available) * 100);
 ?>
 
-<b-progress type="is-danger" :value="40" show-value>
-</b-progress>
 
 <div class="flat-progress">
-    <div class="done" style="width: <?= $percent_done ?>%;"></div>
+    <div class="done" style="width: <?= $percent_done; ?>%;"></div>
     <div class="text">
         <span class="digits" ><?= $letters_purchased; ?> </span>
         letters purchased
     </div>
 </div>
-
+<small class="flat-subtitle"><?= $letters_remaining; ?> letters remaining to be purchased</small>
 <style>
+    small.flat-subtitle {
+        display: block;
+        font-size: .75rem;
+        text-align: center;
+        color: #333333;
+    }
 .flat-progress {
     background: white;
     border: 1px solid #AABBFF;
@@ -45,9 +49,9 @@
     height: 66px;
     display: flex;
     align-items: center;
-    padding: 0 40px;
+
     font-weight: 700;
-    font-size: 19px;
+    font-size: 1.2rem;
 }
 .flat-progress .digits {
     margin-right: 5px;
