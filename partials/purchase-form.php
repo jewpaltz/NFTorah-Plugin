@@ -53,8 +53,8 @@
     <div class="noscript">
         <article class="message is-danger" style="margin-top: 5px;">
             <div class="message-body">
-                <h1 class="title is-4">Sorry, this website doesn't support your web browser.</h1>
-                <h2 class="subtitle is-4">Please try opening this site in chrome or on a desktop computer.</h2>
+                <h1 class="title is-4 has-text-danger-dark">Sorry, this website doesn't support your web browser.</h1>
+                <h2 class="subtitle is-4 has-text-danger-dark">Please try opening this site in chrome or on a desktop computer.</h2>
             </div>
         </article>
     </div>

@@ -63,7 +63,29 @@ public function register_routes() {
             ),
         ),
     ) );
-
+    register_rest_route( $namespace, '/metadata' . '/(?P<id>[\d]+)', array(
+        array(
+            'methods'         => WP_REST_Server::READABLE,
+            'callback'        => array( $this, 'get_metadata' ),
+            'permission_callback' => '__return_true',
+            'args'            => array(
+                'context'          => array(
+                    'default'      => 'view',
+                    'required'     => true,
+                ),
+                'params' => array(
+                    'required'     => false,
+                    'id' => array(
+                        'description'        => 'The id of the letter in the NFT',
+                        'type'               => 'integer',
+                        'default'            => 1,
+                        'sanitize_callback'  => 'absint',
+                    ),
+                ),
+                $this->get_collection_params()
+            ),
+        ),
+    ) );
     /*
     register_rest_route( $namespace, '/' . $base . '/schema', array(
         'methods'         => WP_REST_Server::READABLE,
@@ -126,6 +148,26 @@ public function update_item( $request ) {
  */
 public function delete_item( $request ) {
     
+}
+
+/**
+ * Get the metadata for the ERC721 token
+ *
+ * @param WP_REST_Request $request Full data about the request.
+ * @return WP_Error|WP_REST_Response
+ */
+public function get_metadata( $request ) {
+    return [
+        "name" => "NFTorah Letter #" . $request['id'],
+        "description" => "This NFT represents one letter written in a physical Torah for the original owner of this token. The name of the owner and the exact letter are not kept on chain to increase the anonymity of all involved. However the NFTorah authority keeps records for this letter #" . $request['id'],
+        "image" => "https://zaidyla.com/wp-content/uploads/2021/05/Purple-Seal-High-School-Diploma-Certificate.png",
+        "attributes" => [
+            [ 
+                "first name" => "Moshe",
+                "mothers name" => "Shoshanah Beila",
+            ]
+        ]
+    ];
 }
 
 /**
