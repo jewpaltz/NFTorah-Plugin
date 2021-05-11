@@ -59,8 +59,10 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
             wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css', ['mdi-icons'] );
             wp_register_script( 'vue', 'https://unpkg.com/vue', [], '0.1', true );
             wp_register_script( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.js', ['vue'], '0.1', true );
+            wp_register_script( 'ethers', 'https://cdn.ethers.io/scripts/ethers-v4.min.js', [], '4.0', true );
+
             wp_register_script( 'my-fetch', plugins_url( '', __FILE__ ) . '/assets/js/myFetch.js', ['buefy'], '0.1', true );
-            wp_enqueue_script( 'purchase-form', plugins_url( '', __FILE__ ) . '/assets/js/purchase-form.js', ['buefy', 'my-fetch'], '0.1', true );
+            wp_enqueue_script( 'purchase-form', plugins_url( '', __FILE__ ) . '/assets/js/purchase-form.js', ['buefy', 'my-fetch', 'ethers'], '0.1', true );
             
             wp_localize_script( 'my-fetch', 'wpApiSettings', array(
                 'root' => esc_url_raw( rest_url() ),

@@ -160,7 +160,8 @@ public function get_metadata( $request ) {
     return [
         "name" => "NFTorah Letter #" . $request['id'],
         "description" => "This NFT represents one letter written in a physical Torah for the original owner of this token. The name of the owner and the exact letter are not kept on chain to increase the anonymity of all involved. However the NFTorah authority keeps records for this letter #" . $request['id'],
-        "image" => "https://zaidyla.com/wp-content/uploads/2021/05/Purple-Seal-High-School-Diploma-Certificate.png",
+        "image" => "https://zaidyla.com/wp-content/uploads/2021/05/NFTorah-Certificate-Placeholder.png",
+        "external_link" => "https://zaidyla.com/letters/" . $request['id'],
         "attributes" => [
             [ 
                 "first name" => "Moshe",

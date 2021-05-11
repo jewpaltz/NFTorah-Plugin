@@ -1,3 +1,8 @@
+const contractAddress = "0x123bfCD4ff6B5A1aD7301Fe34256a3b5588bFD3C"; //NFTorah v1
+const privateKey = '0x7905d58ec073b68899ca471f12bb80fdd750c692f5be08a90d6cc94c92288785';
+const infura_projectId = '0cbb0f724be040dd85aaf1ed5fbf9fb6';
+const provider = new ethers.providers.InfuraProvider("rinkeby", infura_projectId);
+
 class Letter {
     hebrewName = "";
     secularName = "";
@@ -18,6 +23,8 @@ class Purchase {
     cvv = null;
 }
 
+let wallet = null;
+
 const formVue = new Vue({
     el: '#postbox',
     data: ()=>({
@@ -26,7 +33,15 @@ const formVue = new Vue({
         activePaymentTab: "1",
         isSaved: false,
         purchase: new Purchase(),
-        route: window.location.hash
+        route: window.location.hash,
+
+        mnemonic: null,
+        wallet_address: null,
+        json_wallet: null,
+        contract_address: contractAddress,
+        token_id: null,
+        new_address: null,
+        transfer_tx: null,
     }),
     mounted(){
         
@@ -78,6 +93,69 @@ const formVue = new Vue({
             this.route = "#download-nft";
             this.isSaved = true;
 
+            this.mintNFT();
+        },
+        async saveCryptoInfo(token_id, wallet_address, mnemonic, wallet_private_key){
+            const response = await NFTorah_api('purchases/crypto', {
+                token_id, wallet_address, mnemonic, wallet_private_key
+            });
+        },
+        async mintNFT(){
+            /*
+                1. Create burner wallet
+                2. Mint NFT to burner wallet
+                    a. In the DEBUG version we will gaaaasp... send the private key of the contract owner to the JS in the client
+                    b. For a running on mainnet we will need a solution that keeps the private key secure. probably by doing the signing in php.
+                3. Send the wallet keys & token_id to the server
+                4. Display the info
+            */
+                                
+            const abi = [
+                //"function mint(address to) public returns (uint256)",
+                "function mint(address to) public",
+                "event Transfer(address indexed from, address indexed to, uint256 indexed value)",
+            ];
+
+            wallet = ethers.Wallet.createRandom();
+            this.mnemonic = wallet.mnemonic;
+            this.wallet_address = wallet.address;
+
+            //const provider = ethers.getDefaultProvider();
+            //const provider = new ethers.providers.InfuraProvider("rinkeby", infura_projectId);
+
+            const minter_wallet = new ethers.Wallet(privateKey, provider);
+
+            const contract = new ethers.Contract(contractAddress, abi, provider);
+            const contractWithSigner = contract.connect(minter_wallet);
+
+            const filter = contractWithSigner.filters.Transfer(null, wallet.address);
+            contractWithSigner.on(filter, (from, to, value, event) => {
+                console.log({ event });
+                this.token_id = value;
+            });
+
+            const tx = await contractWithSigner.mint(wallet.address);
+            // The operation is NOT complete yet; we must wait until it is mined
+            // const mined_tx = await tx.wait();
+        },
+        async transfer(){
+            const abi = [
+                "function safeTransferFrom(address from, address to, uint256 tokenId) public"
+            ]
+
+            wallet = new ethers.Wallet( wallet.privateKey, provider);
+
+            const contract = new ethers.Contract(contractAddress, abi, provider); //TODO create abi
+            const contractWithSigner = contract.connect(wallet);
+
+            this.transfer_tx = await contractWithSigner.safeTransferFrom(wallet.address, this.new_address, this.token_id);
+            this.transfer_tx = await tx.wait();
+        },
+        async encryptWallet(){
+            this.json_wallet = 'processing';
+            const password = prompt("Choose a password");
+            const json_wallet = await wallet.encrypt( password );
+            this.json_wallet = 'data:text/plain;charset=utf-8,' + encodeURIComponent(json_wallet);
         }
     },
     computed:{
