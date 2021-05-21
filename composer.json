@@ -20,6 +20,8 @@
         }
       ],
       "require": {
-        "digitaldonkey/ethereum-php": "dev-master"
+        "digitaldonkey/ethereum-php": "dev-master",
+        "vlucas/phpdotenv": "5.3.0",
+        "stripe/stripe-php": "^7.78.0"
       }
 }

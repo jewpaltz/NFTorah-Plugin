@@ -117,10 +117,28 @@ class Purchases{
             
     }
 
+    public static function PayStripe($paymentMethodId, $amount, $currency = 'usd'){
+        \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+        $transaction = [
+            "amount" => $amount * 100,
+            "currency" => $currency,
+            "payment_method" => $paymentMethodId,
+            "confirmation_method" => "manual",
+            "confirm" => true,
+            "use_stripe_sdk" => true,
+        ];
+
+        //  Errors processing transaction are thrown to calling code i.e. REST controller to be returned as an error to the client.
+        $intent = \Stripe\PaymentIntent::create($transaction);
+
+        return $intent;
+    }
+
     private static function centerTextX($font, $size, $txt, $image_width){
         $text_size = imagettfbbox(24, 0, $font, $txt);
         $text_width = max([$text_size[2], $text_size[4]]) - min([$text_size[0], $text_size[6]]);
         //$text_height = max([$text_size[5], $text_size[7]]) - min([$text_size[1], $text_size[3]]);
         return CEIL(($image_width - $text_width) / 2);
     }
+
 }
