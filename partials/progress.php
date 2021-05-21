@@ -11,12 +11,12 @@
 
 <div class="flat-progress">
     <div class=" has-background-success done" ></div>
-    <div class="text">
+    <div class="text has-text-success-dark">
         <span class="digits" ><?= number_format($letters_purchased) ?> </span>
         letters purchased
     </div>
 </div>
-<small class="flat-subtitle"><?= number_format($letters_remaining) ?> letters remaining to be purchased</small>
+<small class="flat-subtitle"><?= number_format($letters_remaining) ?> letters available to purchase</small>
 <script>
     const doneDiv =  document.querySelector(".flat-progress .done");
     setTimeout(() => {
@@ -26,7 +26,7 @@
 <style>
     small.flat-subtitle {
         display: block;
-        font-size: .75rem;
+        font-size: .9rem;
         text-align: center;
         color: #333333;
     }
