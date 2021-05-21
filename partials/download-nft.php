@@ -51,8 +51,8 @@
   </p>
   <div class="panel-block">
     <p>
-        Write down this secret phrase on a piece of paper. It is the secret key by which any Ethereum wallet should be able to access your token.
-        <i class="has-text-danger">We will also be keeping a key on our server. Which isn't very secure practice. So, please don't store any money or cryptocurrency in it.</i> <br />
+        Write down this secret phrase on a piece of paper. It is the secret key by means of which any Ethereum wallet should be able to access your token.
+        <i class="has-text-danger">We will also be keeping a key on our server. Which isn't a very secure practice. So, please don't store any money or cryptocurrency in it.</i> <br />
         <b-skeleton v-if="!mnemonic"></b-skeleton>
         <code style="display: block; font-size: x-large; padding:15px; " v-show="mnemonic">{{mnemonic}}</code>
     </p>
