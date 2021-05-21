@@ -37,7 +37,11 @@ function NFTorah_api(url, data, method){
 }
 
 function toastError(msg){
-    toastr.open({
+    console.log({msg});
+    if(typeof(msg) == 'Object'){
+        msg = JSON.stringify(msg);
+    }
+    Buefy.ToastProgrammatic.open({
         message: msg,
         queue: false,
         type: 'is-danger'

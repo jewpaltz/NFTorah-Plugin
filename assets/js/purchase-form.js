@@ -22,6 +22,7 @@ class Purchase {
     cardNumber = null;
     expirationDate = null;
     cvv = null;
+    paymentMethodId = null;
 }
 
 let wallet = null;
@@ -33,8 +34,11 @@ const formVue = new Vue({
         activeItemTab: "1",
         activePaymentTab: "1",
         isSaved: false,
+        isLoading: false,
         purchase: new Purchase(),
         route: window.location.hash,
+
+        card_el: null,
 
         mnemonic: null,
         wallet_address: null,
@@ -45,7 +49,7 @@ const formVue = new Vue({
         transfer_tx: null,
     }),
     mounted(){
-        
+        this.card_el = setupStripeElements();
     },
     methods: {
         addLetter(){
@@ -82,6 +86,21 @@ const formVue = new Vue({
             return true;
          },
         async submitForm(){
+            this.isLoading = true;
+            try {
+                const payment_results = await pay_stripe(stripe, this.card_el);
+                console.log({payment_results});
+                
+                this.purchase.cardNumber = payment_results.paymentMethod.card.last4;
+                this.purchase.expirationDate = payment_results.paymentMethod.card.exp_month + "/" + payment_results.paymentMethod.card.exp_year;
+                this.purchase.paymentMethodId = payment_results.paymentMethod.id;           
+            } catch (error) {
+                console.error(error);
+                toastError(error.message ?? error);
+                return;
+            }
+
+            this.isLoading = false;
 
             this.purchase.paid = this.price;
             const data = await  NFTorah_api('purchases', {
