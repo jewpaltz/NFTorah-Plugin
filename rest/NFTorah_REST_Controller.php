@@ -127,7 +127,7 @@ public function create_item( $request ) {
     $purchase = $request['purchase'];
     $letters = $request['letters'];
     //print_r([ 'purchase'=> $purchase, 'data'=> $letters]);
-    return NFTorah::PurchaseFormSave($purchase, $letters, $request->get_header('X-WP-Nonce'));
+    return NFTorah\Purchases::Create($purchase, $letters, $request->get_header('X-WP-Nonce'));
 }
 
 /**
