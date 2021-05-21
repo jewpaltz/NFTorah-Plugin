@@ -10,13 +10,19 @@
 
 
 <div class="flat-progress">
-    <div class="done" style="width: <?= $percent_done; ?>%;"></div>
+    <div class=" has-background-success done" ></div>
     <div class="text">
-        <span class="digits" ><?= $letters_purchased; ?> </span>
+        <span class="digits" ><?= number_format($letters_purchased) ?> </span>
         letters purchased
     </div>
 </div>
-<small class="flat-subtitle"><?= $letters_remaining; ?> letters remaining to be purchased</small>
+<small class="flat-subtitle"><?= number_format($letters_remaining) ?> letters remaining to be purchased</small>
+<script>
+    const doneDiv =  document.querySelector(".flat-progress .done");
+    setTimeout(() => {
+        doneDiv.style.width = "<?= $percent_done ?>%";
+    }, 100); 
+</script>
 <style>
     small.flat-subtitle {
         display: block;
@@ -26,7 +32,7 @@
     }
 .flat-progress {
     background: white;
-    border: 1px solid #AABBFF;
+    border: 1px solid hsl(141, 53%, 31%);
     height: 66px;
     border-radius: 4px;
     position: relative;
@@ -40,7 +46,8 @@
     top: 0;
     left: 0;
     height: 100%;
-    background: #D80027;
+    width: 0%;
+    /*background: #D80027;*/
     transition: all 3.3s linear;
 }
 .flat-progress .text {
