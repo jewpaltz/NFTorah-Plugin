@@ -43,6 +43,7 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
         public static function RegisterPublicHooks(){
             add_shortcode( 'NFTorah_purchase_form', [__CLASS__, 'PurchaseFormHtml'] );
             add_shortcode( 'NFTorah_purchase_list', [__CLASS__, 'PurchaseListHtml'] );
+            add_shortcode( 'NFTorah_progress_bar', [__CLASS__, 'ProgressBar'] );
         }
 
         public static function RegisterAdminHooks(){
@@ -53,6 +54,9 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
             wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css' );
             $data = NFTorah\Purchases::GetList();
             require_once __DIR__ . '/partials/display-list.php';
+        }
+        public static function ProgressBar(){
+            require_once __DIR__ . '/partials/progress.php';
         }
         public static function PurchaseFormHtml(){
             wp_register_style( 'mdi-icons', 'https://cdn.jsdelivr.net/npm/@mdi/font@5.9.55/css/materialdesignicons.min.css' );
