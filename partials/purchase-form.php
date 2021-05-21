@@ -1,7 +1,7 @@
     <?php include __DIR__ . '/progress.php'; ?>
 <div id="postbox" :class="{ loaded: true }">
     <form id="purchase-form" ref="form" method="post" @submit.prevent="" v-if="page == 1">
-
+        <h3 class="title is-3"> Purchase a letter </h3>
         <b-tabs v-model="activeItemTab">
             <b-tab-item label="Individual Letters" value="1">
                 <?php include __DIR__ . '/letters-form.php'; ?>
@@ -14,10 +14,13 @@
             </b-tab-item>
         </b-tabs>
 
-        <div class="has-text-centered">
-                <p class="heading">Price</p>
-                <div style="font-size:36pt; font-weight: 900">${{price}}</div>
-
+        <div class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    <p class="heading">Price</p>
+                    <p class="title">${{price}}</p>
+                </div>
+            </div>
         </div>
 
         <small><b>Information of person paying:</b></small>
