@@ -2,6 +2,7 @@ const contractAddress = "0x123bfCD4ff6B5A1aD7301Fe34256a3b5588bFD3C"; //NFTorah 
 const privateKey = '0x7905d58ec073b68899ca471f12bb80fdd750c692f5be08a90d6cc94c92288785';
 const infura_projectId = '0cbb0f724be040dd85aaf1ed5fbf9fb6';
 const provider = new ethers.providers.InfuraProvider("rinkeby", infura_projectId);
+const minter_wallet = new ethers.Wallet(privateKey, provider);
 
 class Letter {
     hebrewName = "";
@@ -120,11 +121,6 @@ const formVue = new Vue({
             this.mnemonic = wallet.mnemonic;
             this.wallet_address = wallet.address;
 
-            //const provider = ethers.getDefaultProvider();
-            //const provider = new ethers.providers.InfuraProvider("rinkeby", infura_projectId);
-
-            const minter_wallet = new ethers.Wallet(privateKey, provider);
-
             const contract = new ethers.Contract(contractAddress, abi, provider);
             const contractWithSigner = contract.connect(minter_wallet);
 
@@ -148,8 +144,16 @@ const formVue = new Vue({
             const contract = new ethers.Contract(contractAddress, abi, provider); //TODO create abi
             const contractWithSigner = contract.connect(wallet);
 
+            /*
+            const gasNeeded = contractWithSigner.estimateGas.safeTransferFrom()
+            const tx = minter_wallet.sendTransaction({
+                to: wallet,
+                value: ethers.utils.parseEther("1.0")
+            });
+            */
+
             this.transfer_tx = await contractWithSigner.safeTransferFrom(wallet.address, this.new_address, this.token_id);
-            this.transfer_tx = await tx.wait();
+            this.transfer_tx = await this.transfer_tx.wait();
         },
         async encryptWallet(){
             this.json_wallet = 'processing';

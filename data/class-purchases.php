@@ -23,6 +23,7 @@ class Purchases{
         }
         return $data;
     }
+
     public static function Create($purchase, $letters, $nonce){
         global $wpdb;
     
@@ -56,6 +57,7 @@ class Purchases{
     
 
         foreach ($letters as $key => $letter) {
+            //TODO: find actual letter and record details about it. letter, parshah, etc.
             $wpdb->insert(
                 $wpdb->prefix . 'torah_letter',
                 array(
@@ -72,8 +74,10 @@ class Purchases{
             }
             $results[] = $wpdb->last_result;
             $letters[$key]["id"] = $wpdb->insert_id;
+
+            self::CreateCertificate($purchase, $letters[$key]);
         }
-    
+
         return [
             "msg" => count($errors) == 0 ? "Saved successfully! :)" : "There were errors saving your purchase",
             "purchase_id" => $purchase_id,
@@ -82,5 +86,41 @@ class Purchases{
             "results" => $results
         ];
     }
+    public static function CreateCertificate($purchase, $letter){
 
+            $upload_dir   = wp_upload_dir();
+            $certificate_dir = "{$upload_dir['basedir']}/torah-certificates";
+            if ( ! file_exists( $certificate_dir ) ) {
+                wp_mkdir_p( $certificate_dir );
+
+            }
+            
+            $img = imagecreatefrompng(__DIR__ . '/../assets/blank-certificate.png');
+
+            $black = imagecolorallocate($img, 0, 0, 0);
+            $font = __DIR__ . "/../assets/Courgette-Regular.ttf"; 
+            $hebrewFont = __DIR__ . "/../assets/DavidLibre-Bold.ttf"; 
+
+            $txt = hebrev('ז in the Parshah לך לך');
+            $centerX = self::centerTextX( $hebrewFont, 48, $txt, imagesx($img) );
+            imagettftext($img, 48, 0, $centerX, 550, $black, $hebrewFont, $txt);
+
+            $txt = $letter['hebrewName'] ? $letter['hebrewName'] : 'Anonymous';
+            $centerX = self::centerTextX( $font, 48, $txt, imagesx($img) );
+            imagettftext($img, 48, 0, $centerX, 740, $black, $font, $txt);
+
+            $txt = '#' . $letter['id'];
+            $centerX = self::centerTextX( $font, 72, $txt, imagesx($img) ); //    Centered 175 pixels off the right edge
+            imagettftext($img, 72, 0, $centerX + 460, 1150, $black, $font, $txt);
+
+            imagepng($img, "$certificate_dir/{$letter['id']}.png");
+            
+    }
+
+    private static function centerTextX($font, $size, $txt, $image_width){
+        $text_size = imagettfbbox(24, 0, $font, $txt);
+        $text_width = max([$text_size[2], $text_size[4]]) - min([$text_size[0], $text_size[6]]);
+        //$text_height = max([$text_size[5], $text_size[7]]) - min([$text_size[1], $text_size[3]]);
+        return CEIL(($image_width - $text_width) / 2);
+    }
 }
