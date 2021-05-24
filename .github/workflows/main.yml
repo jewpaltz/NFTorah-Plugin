@@ -34,6 +34,12 @@ jobs:
     # - name: Run test suite
     #   run: composer run-script test
     
+    - name: Remove File
+      uses: JesseTG/rm@v1.0.2
+      with:
+        path: /.gitignore
+        # IT may be more prudent to have a separate .gitignore for this stage and copy it over the regular one instead of totally deleting the .gitignore file
+
     - name: Push to Staging Branch
       uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
       with:
