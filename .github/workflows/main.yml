@@ -45,6 +45,6 @@ jobs:
       env:
         REPO: self
         BRANCH: staging # The branch name where you want to push the assets
-        FOLDER: . # The directory where your assets are generated
+        FOLDER: / # The directory where your assets are generated
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         MESSAGE: "Build: ({sha}) {msg}" # The commit message
