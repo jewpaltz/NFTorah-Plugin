@@ -118,7 +118,7 @@ class Purchases{
     }
 
     public static function PayStripe($paymentMethodId, $amount, $currency = 'usd'){
-        \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+        \Stripe\Stripe::setApiKey(getenv('STRIPE_SECRET_KEY'));
         $transaction = [
             "amount" => $amount * 100,
             "currency" => $currency,
