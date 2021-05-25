@@ -19,6 +19,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 if(!$_ENV['STRIPE_PUB_KEY']){
+    print_r($_ENV);
     throw new Error('You need to setup your Stripe Environment Variables');
 }
  
