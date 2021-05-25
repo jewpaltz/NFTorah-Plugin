@@ -17,7 +17,10 @@
  */
 require_once __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+$dotenv->safeLoad();
+if(!$_ENV['STRIPE_PUB_KEY']){
+    throw new Error('You need to setup your Stripe Environment Variables');
+}
  
 require_once __DIR__ . '/class-NFTorah.php';
 
