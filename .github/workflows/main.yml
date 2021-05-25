@@ -37,16 +37,16 @@ jobs:
     - name: Remove File
       uses: JesseTG/rm@v1.0.2
       with:
-        path: /.gitignore
+        path: .gitignore
         # IT may be more prudent to have a separate .gitignore for this stage and copy it over the regular one instead of totally deleting the .gitignore file
 
     - name: Push to Staging Branch
       run: |
         git config user.email "jewpaltz@email.com"
         git config user.name "JewPaltz - Auto Push"
-        git add .
-        git commit -m "Build: ({sha}) {msg}"
         git remote set-url origin https://Jewpaltz:${{secrets.ACCESS_TOKEN}}@github.com/Jewpaltz/NFTorah-Plugin.git
         git remote -v
         git checkout -b staging
+        git add .
+        git commit -m "Build: ({sha}) {msg}"
         git push origin HEAD:staging --force
