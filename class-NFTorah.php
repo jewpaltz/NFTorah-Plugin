@@ -73,7 +73,7 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
             wp_localize_script( 'my-fetch', 'wpApiSettings', array(
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
-                'STRIPE_PUB_KEY' => $_ENV['STRIPE_PUB_KEY'],
+                'STRIPE_PUB_KEY' => getenv('STRIPE_PUB_KEY'),
             ) );
             wp_localize_script( 'stripe-payment', 'paymentKeys', array(
                 
