@@ -127,7 +127,26 @@ public function create_item( $request ) {
     $purchase = $request['purchase'];
     $letters = $request['letters'];
     //print_r([ 'purchase'=> $purchase, 'data'=> $letters]);
-    return NFTorah::PurchaseFormSave($purchase, $letters, $request->get_header('X-WP-Nonce'));
+
+    try {
+        $intent = NFTorah\Purchases::PayStripe($purchase['paymentMethodId'], $purchase['paid'], $request['currency'] ?? 'usd', $request['useStripeSdk'] );
+    } catch (\Throwable $e) {
+        return [ 'error' => $e->getMessage() ];
+    }
+
+    switch($intent->status) {
+        case "requires_payment_method":
+        case "requires_source":
+          // Card was not properly authenticated, suggest a new payment method
+          return [
+            'error' => "Your card was denied, please provide a new payment method"
+          ];
+        case "succeeded":
+            // Payment is complete, authentication not required
+            // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds)
+            $purchase = NFTorah\Purchases::Create($purchase, $letters, $request->get_header('X-WP-Nonce'));
+            return ['intent' => $intent, 'purchase' => $purchase];
+      }
 }
 
 /**

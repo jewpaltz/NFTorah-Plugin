@@ -28,4 +28,4 @@
             </div>
         </div>
     </div>
-    <b-button  type="is-primary is-light" expanded @click.prevent="addLetter">Add Another Letter</b-button>
+    <b-button  type="is-primary is-light is-outlined" expanded @click.prevent="addLetter">Add Another Letter</b-button>

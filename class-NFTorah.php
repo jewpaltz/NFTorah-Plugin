@@ -43,6 +43,7 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
         public static function RegisterPublicHooks(){
             add_shortcode( 'NFTorah_purchase_form', [__CLASS__, 'PurchaseFormHtml'] );
             add_shortcode( 'NFTorah_purchase_list', [__CLASS__, 'PurchaseListHtml'] );
+            add_shortcode( 'NFTorah_progress_bar', [__CLASS__, 'ProgressBar'] );
         }
 
         public static function RegisterAdminHooks(){
@@ -54,95 +55,36 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
             $data = NFTorah\Purchases::GetList();
             require_once __DIR__ . '/partials/display-list.php';
         }
+        public static function ProgressBar(){
+            require_once __DIR__ . '/partials/progress.php';
+        }
         public static function PurchaseFormHtml(){
             wp_register_style( 'mdi-icons', 'https://cdn.jsdelivr.net/npm/@mdi/font@5.9.55/css/materialdesignicons.min.css' );
             wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css', ['mdi-icons'] );
             wp_register_script( 'vue', 'https://unpkg.com/vue', [], '0.1', true );
             wp_register_script( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.js', ['vue'], '0.1', true );
             wp_register_script( 'ethers', 'https://cdn.ethers.io/scripts/ethers-v4.min.js', [], '4.0', true );
+            wp_register_script( 'stripe', 'https://js.stripe.com/v3/', [], '3.0', true );
 
             wp_register_script( 'my-fetch', plugins_url( '', __FILE__ ) . '/assets/js/myFetch.js', ['buefy'], '0.1', true );
-            wp_enqueue_script( 'purchase-form', plugins_url( '', __FILE__ ) . '/assets/js/purchase-form.js', ['buefy', 'my-fetch', 'ethers'], '0.1', true );
+            wp_register_script( 'stripe-payment', plugins_url( '', __FILE__ ) . '/assets/js/stripe-payment.js', ['stripe'], '1.1', true );
+            wp_enqueue_script( 'purchase-form', plugins_url( '', __FILE__ ) . '/assets/js/purchase-form.js', ['buefy', 'my-fetch', 'ethers', 'stripe-payment'], '0.2', true );
             
             wp_localize_script( 'my-fetch', 'wpApiSettings', array(
                 'root' => esc_url_raw( rest_url() ),
-                'nonce' => wp_create_nonce( 'wp_rest' )
+                'nonce' => wp_create_nonce( 'wp_rest' ),
+                'STRIPE_PUB_KEY' => $_ENV['STRIPE_PUB_KEY'],
+            ) );
+            wp_localize_script( 'stripe-payment', 'paymentKeys', array(
+                
             ) );
 
-            if(!self::IsPurchaseFormSubmitted()){
-                ob_start();
-                require __DIR__ . '/partials/purchase-form.php';    
-                return ob_get_clean();       
-            }else{
-                self::PurchaseFormSave();
-                return self::DownloadNFTHtml();
-            }
-        }
+            ob_start();
+            require __DIR__ . '/partials/purchase-form.php';    
+            return ob_get_clean();       
 
-        public static function IsPurchaseFormSubmitted(){
-            return isset($_POST['title']);
         }
         
-        public static function PurchaseFormSave($purchase, $letters, $nonce){
-            global $wpdb;
-        
-            $errors = [];
-            $results = [];
-
-            // Check that the nonce was set and valid
-            if( !wp_verify_nonce($nonce, 'wp_rest') ) {
-                throw new Requests_Exception_HTTP_403( 'Did not save because your form seemed to be invalid. Sorry');
-            }
-        
-            $wpdb->insert(
-                $wpdb->prefix . 'torah_purchase',
-                array(
-                    'firstName'     => $purchase['firstName'],
-                    'lastName'      => $purchase['lastName'],
-                    'email'         => $purchase['email'],
-                    'phone'         => $purchase['phone'],
-                    'paid'          => $purchase['paid'],
-                    'cardNumber'    => is_numeric( $purchase['cardNumber'] ) ? substr($purchase['cardNumber'], -4) : $purchase['cardNumber'],
-                    'expirationDate'=> $purchase['expirationDate'],
-                    'cvv'           => $purchase['cvv'],
-                    'created_at'    => current_time( 'mysql', true ),
-                )
-            );
-            if($wpdb->last_error){
-                $errors[] = $wpdb->last_error;
-            }
-            $results[] = $wpdb->last_result;
-            $purchase_id = $wpdb->insert_id;
-        
-
-            foreach ($letters as $key => $letter) {
-                $wpdb->insert(
-                    $wpdb->prefix . 'torah_letter',
-                    array(
-                        'purchase_id'   => $purchase_id,
-                        'hebrewName'    => $letter['hebrewName'],
-                        'secularName'   => $letter['secularName'],
-                        'lastName'      => $letter['lastName'],
-                        'mothersName'   => $letter['mothersName'],
-                        'created_at'    => current_time( 'mysql', true ),
-                    )
-                );
-                if($wpdb->last_error){
-                    $errors[] = $wpdb->last_error;
-                }
-                $results[] = $wpdb->last_result;
-                $letters[$key]["id"] = $wpdb->insert_id;
-            }
-        
-            return [
-                "msg" => count($errors) == 0 ? "Saved successfully! :)" : "There were errors saving your purchase",
-                "purchase_id" => $purchase_id,
-                "letters" => $letters,
-                "errors" => $errors,
-                "results" => $results
-            ];
-        }
-
         public static function DownloadNFTHtml(){
             ob_start();
             require __DIR__ . '/partials/download-nft.php';    
