@@ -2,9 +2,9 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ development ]
+    branches: [ development, main ]
   pull_request:
-    branches: [ development ]
+    branches: [ development, main ]
 
 jobs:
   build:
@@ -48,5 +48,5 @@ jobs:
         git remote -v
         git checkout -b ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }} 
         git add .
-        git commit -m "Build: (${{github.action}}) ${{github.event_name}}"
+        git commit -m "Build: (${{github.event.head_commit.message}}"
         git push origin HEAD:${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }} --force
