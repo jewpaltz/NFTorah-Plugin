@@ -48,5 +48,5 @@ jobs:
         git remote -v
         git checkout -b staging
         git add .
-        git commit -m "Build: ({sha}) {msg}"
+        git commit -m "Build: ({github.action}) {github.event_name}"
         git push origin HEAD:staging --force
