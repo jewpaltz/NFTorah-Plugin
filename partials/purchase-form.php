@@ -9,14 +9,14 @@
             <b-tab-item value="2">
                 <template slot="header">
                     Verses & Sections
-                    <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+                    <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
                 </template>
                 <h1>Buy an entire Verse or Parshah</h1>
             </b-tab-item>
             <b-tab-item value="3">
                 <template slot="header">
                     Special Sections
-                    <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+                    <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
                 </template>
                 <?php include __DIR__ . '/special-sections-form.php'; ?>
             </b-tab-item>
@@ -71,7 +71,7 @@
     </div>
 
     <div class="notification is-warning is-light">
-        <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+        <img class="icon" style="height: 20px; width: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
         Feature not yet available. Coming Soon!
     </div>
 </div>

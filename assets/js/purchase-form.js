@@ -50,6 +50,21 @@ const formVue = new Vue({
     }),
     mounted(){
         this.card_el = setupStripeElements();
+        this.$watch('letters.0.hebrewName', (newVal, oldVal)=>{
+            if(!this.purchase.firstName || this.purchase.firstName == oldVal){
+                this.purchase.firstName = newVal;
+            }
+        })
+        this.$watch('letters.0.secularName', (newVal, oldVal)=>{
+            if(!this.purchase.firstName || this.purchase.firstName == oldVal || this.purchase.firstName == this.letters[0].hebrewName){
+                this.purchase.firstName = newVal;
+            }
+        })
+        this.$watch('letters.0.lastName', (newVal, oldVal)=>{
+            if(!this.purchase.lastName || this.purchase.lastName == oldVal){
+                this.purchase.lastName = newVal;
+            }
+        })
     },
     methods: {
         addLetter(){
@@ -193,7 +208,7 @@ const formVue = new Vue({
         a_letter(){
             return this.letters.length == 1 ? "a letter" : this.letters.length + " letters"
         }
-    }
+    },
 });       
 
 
