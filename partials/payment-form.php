@@ -11,7 +11,7 @@
         <b-tab-item  value="2">
             <template slot="header">
                 PayPal
-                <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+                <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
             </template>
             <p>
                 Once you complete the transaction in PayPal. You will be returned to this page to download your NFTs
@@ -24,7 +24,7 @@
         <b-tab-item value="3">
             <template slot="header">
                 CryptoCurrency 
-                <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+                <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
             </template>
         <ul>
             <li>
