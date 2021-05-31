@@ -28,7 +28,7 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
         }
 
         public static function AdminInit(){
-
+            self::RegisterAdminHooks();
         }
 
         public static function RestApiInit(){
@@ -47,9 +47,23 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
         }
 
         public static function RegisterAdminHooks(){
-
+            
+            add_action('admin_notices', [__CLASS__, 'AdminNotices']);
         }
 
+        public static function AdminNotices(){
+            if(empty( getenv('STRIPE_PUB_KEY') )){
+                //print_r($_ENV);
+                ?>
+                    <div class="notice notice-error">
+                        <p>
+                            <b>You need to setup your Stripe Environment Variables</b><br />
+                            The NFTorah Plugin can't charge credit cards without them.
+                        </p>
+                    </div>
+                <?php
+            }
+        }
         public static function PurchaseListHtml(){
             wp_enqueue_style( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.css' );
             $data = NFTorah\Purchases::GetList();

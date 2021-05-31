@@ -6,10 +6,18 @@
             <b-tab-item label="Individual Letters" value="1">
                 <?php include __DIR__ . '/letters-form.php'; ?>
             </b-tab-item>
-            <b-tab-item label="Verses & Sections" value="2">
+            <b-tab-item value="2" disabled>
+                <template slot="header">
+                    Verses & Sections
+                    <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+                </template>
                 <h1>Buy an entire Verse or Parshah</h1>
             </b-tab-item>
-            <b-tab-item label="Special Sections" value="3">
+            <b-tab-item value="3" disabled>
+                <template slot="header">
+                    Special Sections
+                    <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+                </template>
                 <?php include __DIR__ . '/special-sections-form.php'; ?>
             </b-tab-item>
         </b-tabs>
@@ -60,6 +68,11 @@
                 <h2 class="subtitle is-4 has-text-danger-dark">Please try opening this site in chrome or on a desktop computer.</h2>
             </div>
         </article>
+    </div>
+
+    <div class="notification is-warning is-light">
+        <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+        Feature not yet available. Coming Soon!
     </div>
 </div>
 
