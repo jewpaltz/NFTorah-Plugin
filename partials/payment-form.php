@@ -8,7 +8,7 @@
 
         </b-tab-item>
 
-        <b-tab-item  value="2" disabled>
+        <b-tab-item  value="2">
             <template slot="header">
                 PayPal
                 <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
@@ -21,7 +21,7 @@
             </b-button>
         </b-tab-item>
 
-        <b-tab-item value="3" disabled>
+        <b-tab-item value="3">
             <template slot="header">
                 CryptoCurrency 
                 <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
