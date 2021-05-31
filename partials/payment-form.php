@@ -8,7 +8,11 @@
 
         </b-tab-item>
 
-        <b-tab-item label="PayPal"  value="2">
+        <b-tab-item  value="2" disabled>
+            <template slot="header">
+                PayPal
+                <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+            </template>
             <p>
                 Once you complete the transaction in PayPal. You will be returned to this page to download your NFTs
             </p>
@@ -17,7 +21,11 @@
             </b-button>
         </b-tab-item>
 
-        <b-tab-item label="CryptoCurrency (Not avail yet)"  value="3" disabled>
+        <b-tab-item value="3" disabled>
+            <template slot="header">
+                CryptoCurrency 
+                <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
+            </template>
         <ul>
             <li>
                 <b>Option 1:</b> Use an integrated Web3 wallet like MetaMask.
