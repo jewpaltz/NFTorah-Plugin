@@ -6,14 +6,14 @@
             <b-tab-item label="Individual Letters" value="1">
                 <?php include __DIR__ . '/letters-form.php'; ?>
             </b-tab-item>
-            <b-tab-item value="2" disabled>
+            <b-tab-item value="2">
                 <template slot="header">
                     Verses & Sections
                     <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
                 </template>
                 <h1>Buy an entire Verse or Parshah</h1>
             </b-tab-item>
-            <b-tab-item value="3" disabled>
+            <b-tab-item value="3">
                 <template slot="header">
                     Special Sections
                     <img class="icon" style="height: 20px;" src="<?= plugins_url( 'NFTorah/assets/images/coming_soon.png' ) ?>" />
