@@ -20,7 +20,11 @@
     </div>
 </div>
 
-<img :src="`https://zaidyla.com/wp-content/uploads/2021/05/NFTorah-Certificate-Placeholder.png`" width="50%" /> <!-- will be dynamic for each letter eventually -->
+<div class="image" v-for="letter in letters" :key="letter.id" style="width: 50%;">
+    <a :href="letter.certificateUrl" target="_blank">
+        <img :src="letter.certificateUrl" width="50%"  /> 
+    </a>
+</div>
 
 <h4 class="subtitle is-4">
     Blockchain is powerful. But it doesn't need to be difficult.

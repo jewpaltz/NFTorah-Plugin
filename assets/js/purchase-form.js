@@ -124,6 +124,9 @@ const formVue = new Vue({
             });
             console.log({data});
 
+            this.letters = data.purchase.letters;
+            this.purchase.id = data.purchase.purchase_id;
+
             history.pushState(null, null, "#download-nft")
             this.route = "#download-nft";
             this.isSaved = true;

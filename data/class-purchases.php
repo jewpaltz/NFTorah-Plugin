@@ -75,7 +75,7 @@ class Purchases{
             $results[] = $wpdb->last_result;
             $letters[$key]["id"] = $wpdb->insert_id;
 
-            self::CreateCertificate($purchase, $letters[$key]);
+            $letters[$key]["certificateUrl"] = self::CreateCertificate($purchase, $letters[$key]);  // Saves an image and returns the url
         }
 
         return [
@@ -90,6 +90,7 @@ class Purchases{
 
             $upload_dir   = wp_upload_dir();
             $certificate_dir = "{$upload_dir['basedir']}/torah-certificates";
+            $certificate_url = "{$upload_dir['baseurl']}/torah-certificates";
             if ( ! file_exists( $certificate_dir ) ) {
                 wp_mkdir_p( $certificate_dir );
 
@@ -101,7 +102,8 @@ class Purchases{
             $font = __DIR__ . "/../assets/Courgette-Regular.ttf"; 
             $hebrewFont = __DIR__ . "/../assets/DavidLibre-Bold.ttf"; 
 
-            $txt = hebrev('ז in the Parshah לך לך');
+            $parshah_name = self::mb_strrev('לך לך');
+            $txt = hebrev('ז in the Parshah ' . $parshah_name);
             $centerX = self::centerTextX( $hebrewFont, 48, $txt, imagesx($img) );
             imagettftext($img, 48, 0, $centerX, 550, $black, $hebrewFont, $txt);
 
@@ -114,7 +116,8 @@ class Purchases{
             imagettftext($img, 72, 0, $centerX + 460, 1150, $black, $font, $txt);
 
             imagepng($img, "$certificate_dir/{$letter['id']}.png");
-            
+
+            return "$certificate_url/{$letter['id']}.png";        
     }
 
     public static function PayStripe($paymentMethodId, $amount, $currency = 'usd'){
@@ -135,10 +138,17 @@ class Purchases{
     }
 
     private static function centerTextX($font, $size, $txt, $image_width){
-        $text_size = imagettfbbox(24, 0, $font, $txt);
+        $text_size = imagettfbbox($size, 0, $font, $txt);
         $text_width = max([$text_size[2], $text_size[4]]) - min([$text_size[0], $text_size[6]]);
         //$text_height = max([$text_size[5], $text_size[7]]) - min([$text_size[1], $text_size[3]]);
         return CEIL(($image_width - $text_width) / 2);
     }
 
+    static function mb_strrev($str){
+        $r = '';
+        for ($i = mb_strlen($str); $i>=0; $i--) {
+            $r .= mb_substr($str, $i, 1);
+        }
+        return $r;
+    }
 }
