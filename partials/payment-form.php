@@ -13,12 +13,9 @@
                 PayPal
                 <img class="icon" style="height: 20px; width: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
             </template>
-            <p>
-                Once you complete the transaction in PayPal. You will be returned to this page to download your NFTs
-            </p>
-            <b-button  type="is-success " size="is-large" expanded @click.prevent="paypal">
-                Continue to Paypal
-            </b-button>
+            <div class="box">
+                <div id="paypal-button-container"></div>
+            </div>
         </b-tab-item>
 
         <b-tab-item value="3">
