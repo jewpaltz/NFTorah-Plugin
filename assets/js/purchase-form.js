@@ -65,6 +65,8 @@ const formVue = new Vue({
                 this.purchase.lastName = newVal;
             }
         })
+
+        this.setupPayPalButtons();
     },
     methods: {
         addLetter(){
@@ -73,49 +75,41 @@ const formVue = new Vue({
         deleteLetter(i){
             this.letters.splice(i,1);
         },
+
         creditcard(){
-            //  Charge Credit Card
-            this.trySubmitForm();
-        },
-        paypal(){
-            //  Show Paypal UI
-            this.purchase.cardNumber = "PayPal";
-            this.trySubmitForm();
-         },
-         trySubmitForm(){
+            this.isLoading = true;
             if (this.isValid()) {
+                try {
+                    const payment_results = await pay_stripe(stripe, this.card_el);
+                    console.log({payment_results});
+                    
+                    this.purchase.cardNumber = payment_results.paymentMethod.card.last4;
+                    this.purchase.expirationDate = payment_results.paymentMethod.card.exp_month + "/" + payment_results.paymentMethod.card.exp_year;
+                    this.purchase.paymentMethodId = payment_results.paymentMethod.id;           
+                } catch (error) {
+                    console.error(error);
+                    toastError(error.message ?? error);
+                    this.isLoading = false;
+                    return;
+                }
                 this.submitForm();
-              } else {
-                  for (const field of this.$refs.form) {
-                      if(field.blur){
-                          field.dispatchEvent(new Event('blur'));
-                      }
-                  }
-                this.$refs.form.reportValidity();
-              }
-         },
-         isValid(){
+            }
+        },
+
+        isValid(){
             if(!this.$refs.form.checkValidity()){
+                for (const field of this.$refs.form) {
+                    if(field.blur){
+                        field.dispatchEvent(new Event('blur'));
+                    }
+                }
+                this.$refs.form.reportValidity();
+
                 return false;
             }
             return true;
-         },
+        },
         async submitForm(){
-            this.isLoading = true;
-            try {
-                const payment_results = await pay_stripe(stripe, this.card_el);
-                console.log({payment_results});
-                
-                this.purchase.cardNumber = payment_results.paymentMethod.card.last4;
-                this.purchase.expirationDate = payment_results.paymentMethod.card.exp_month + "/" + payment_results.paymentMethod.card.exp_year;
-                this.purchase.paymentMethodId = payment_results.paymentMethod.id;           
-            } catch (error) {
-                console.error(error);
-                toastError(error.message ?? error);
-                return;
-            }
-
-            this.isLoading = false;
 
             this.purchase.paid = this.price;
             const data = await  NFTorah_api('purchases', {
@@ -126,6 +120,7 @@ const formVue = new Vue({
 
             this.letters = data.purchase.letters;
             this.purchase.id = data.purchase.purchase_id;
+            this.isLoading = false;
 
             history.pushState(null, null, "#download-nft")
             this.route = "#download-nft";
@@ -133,6 +128,32 @@ const formVue = new Vue({
 
             this.mintNFT();
         },
+
+        setupPayPalButtons(){
+            /*global paypal*/ //    injected by paypals hosted script
+            const vm = this;
+            paypal.Buttons({
+                createOrder: (data, actions) => {
+                    if (!vm.isValid()) {
+                        return false;
+                    }
+        
+                  return actions.order.create({
+                    purchase_units: [{
+                      amount: {
+                        value: vm.price
+                      }
+                    }]
+                  });
+                },
+                onApprove: function(data, actions) {
+                  return actions.order.capture().then(function(details) {
+                    return vm.submitForm();
+                  });
+                }
+              }).render('#paypal-button-container'); // Display payment options on your web page
+        },
+
         async saveCryptoInfo(token_id, wallet_address, mnemonic, wallet_private_key){
             const response = await NFTorah_api('purchases/crypto', {
                 token_id, wallet_address, mnemonic, wallet_private_key
