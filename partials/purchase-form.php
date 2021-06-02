@@ -61,13 +61,19 @@
     <div v-else-if="page == 2">
         <?php include __DIR__ . '/download-nft.php'; ?>
     </div>
-    <div class="noscript">
-        <article class="message is-danger" style="margin-top: 5px;">
+    <div class="noscript" id="noscript">
+        <article class="message is-danger" style="margin-top: 5px;" id="app-noscript">
             <div class="message-body">
                 <h1 class="title is-4 has-text-danger-dark">Sorry, this website doesn't support your web browser.</h1>
                 <h2 class="subtitle is-4 has-text-danger-dark">Please try opening this site in chrome or on a desktop computer.</h2>
             </div>
         </article>
+        <div id="app-loading">
+        <h1 class="title is-4 has-text-success-dark">Loading ...</h1>
+            <b-skeleton height="80px"></b-skeleton>
+            <b-skeleton height="80px"></b-skeleton>
+            <b-skeleton height="80px"></b-skeleton>
+        </div>
     </div>
 
     <div class="notification is-warning is-light">
@@ -77,10 +83,15 @@
 </div>
 
 <style>
-    #postbox > *, #postbox > *, .loaded#postbox .noscript {
+    #postbox > *, #postbox > *,
+    .loaded#postbox .noscript,
+    #postbox .noscript #app-loading,
+    #postbox .noscript.app-loading #app-noscript {
         display: none;
     }
-    .loaded#postbox > *, #postbox .noscript {
+    .loaded#postbox > *,
+    #postbox .noscript,
+    #postbox .noscript.app-loading #app-loading  {
         display: block;
     }
     .columns:not(:last-child){
@@ -124,6 +135,13 @@
     }
 
 </style>
+<script type="application/javascript">
+    const loadingBox = document.getElementById("noscript");
+    loadingBox.classList.add('app-loading');
+    setTimeout(()=>{
+        loadingBox.classList.remove('app-loading');
+    }, 2000)
+</script>
 <?php
 
 

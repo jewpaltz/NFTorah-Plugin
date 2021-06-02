@@ -2,7 +2,7 @@
         <b-tab-item label="Credit Card"  value="1">
             <div class="sr-input sr-card-element box" id="card-element"></div>
             <div class="sr-field-error" id="card-errors" role="alert"></div>
-            <b-button  type="is-success " size="is-large" expanded  @click.prevent="creditcard">
+            <b-button  type="is-success" size="is-large" expanded :loading="isLoading"  @click.prevent="creditcard">
                 Mint My Torah Tokens
             </b-button>
 

@@ -240,6 +240,7 @@ const formVue = new Vue({
 });       
 
 
+
 window.addEventListener('hashchange', function() {
     formVue.route = window.location.hash;
   }, false);
