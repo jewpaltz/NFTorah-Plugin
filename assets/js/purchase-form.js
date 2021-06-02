@@ -76,7 +76,7 @@ const formVue = new Vue({
             this.letters.splice(i,1);
         },
 
-        creditcard(){
+        async creditcard(){
             this.isLoading = true;
             if (this.isValid()) {
                 try {
@@ -92,7 +92,7 @@ const formVue = new Vue({
                     this.isLoading = false;
                     return;
                 }
-                this.submitForm();
+                return this.submitForm();
             }
         },
 
@@ -134,6 +134,7 @@ const formVue = new Vue({
             const vm = this;
             paypal.Buttons({
                 createOrder: (data, actions) => {
+                    console.log({paypal_data: data});
                     if (!vm.isValid()) {
                         return false;
                     }
@@ -147,9 +148,12 @@ const formVue = new Vue({
                   });
                 },
                 onApprove: function(data, actions) {
-                  return actions.order.capture().then(function(details) {
-                    return vm.submitForm();
-                  });
+                    return actions.order.capture().then(function(details) {
+                        console.log({paypal_details: details});
+                        vm.purchase.cardNumber = "PAYPAL";
+                        vm.purchase.paymentMethodId = details.id
+                        return vm.submitForm();
+                    });
                 }
               }).render('#paypal-button-container'); // Display payment options on your web page
         },

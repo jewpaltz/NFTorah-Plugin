@@ -12,3 +12,7 @@
 - Add a 'Loading' state to the page while the scripts are getting setup.
 
 #### Testing Actions #9
+
+ * Paypal Sandbox Accounts
+   * **Personal:** sb-cfijc6390811@personal.example.com     B+1kw?D'
+   * **Business:** sb-kbsoe6389202@business.example.com     GN)}1X2b
