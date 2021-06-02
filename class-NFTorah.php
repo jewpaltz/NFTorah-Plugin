@@ -79,7 +79,7 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
             wp_register_script( 'buefy', 'https://unpkg.com/buefy/dist/buefy.min.js', ['vue'], '0.1', true );
             wp_register_script( 'ethers', 'https://cdn.ethers.io/scripts/ethers-v4.min.js', [], '4.0', true );
             wp_register_script( 'stripe', 'https://js.stripe.com/v3/', [], '3.0', true );
-            wp_register_script( 'paypal', 'https://www.paypal.com/sdk/js?client-id=' . getenv('PAYPAL_CLIENT_ID'), [], '3.0', true );
+            wp_register_script( 'paypal', 'https://www.paypal.com/sdk/js?client-id=' . getenv('PAYPAL_CLIENT_ID'), [], null, true );
 
             wp_register_script( 'my-fetch', plugins_url( '', __FILE__ ) . '/assets/js/myFetch.js', ['buefy'], '0.1', true );
             wp_register_script( 'stripe-payment', plugins_url( '', __FILE__ ) . '/assets/js/stripe-payment.js', ['stripe'], '1.1', true );

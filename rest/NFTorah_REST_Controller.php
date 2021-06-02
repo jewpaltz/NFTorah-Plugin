@@ -117,7 +117,7 @@ public function get_item( $request ) {
 }
 
 /**
- * Create one item from the collection
+ * Create one Torah Letter Purchase
  *
  * @param WP_REST_Request $request Full data about the request.
  * @return WP_Error|WP_REST_Response
@@ -128,24 +128,51 @@ public function create_item( $request ) {
     $letters = $request['letters'];
     //print_r([ 'purchase'=> $purchase, 'data'=> $letters]);
 
-    try {
-        $intent = NFTorah\Purchases::PayStripe($purchase['paymentMethodId'], $purchase['paid'], $request['currency'] ?? 'usd', $request['useStripeSdk'] );
-    } catch (\Throwable $e) {
-        return [ 'error' => $e->getMessage() ];
+    if($purchase['cardNumber'] == "PAYPAL"){
+        $intent = $this->ConfirmPayPalPayment($purchase);
+        if(1==2){   // Error Condition
+            return [ 'error' => 'Paypal payment wasn\'t successful' ];
+        }
+    }else{
+        try {
+            $intent = $this->ProcessStripePayment($purchase, $request['currency'] ?? 'usd', $request['useStripeSdk']);
+        } catch (\Throwable $e) {
+            return [ 'error' => $e->getMessage() ];
+        }        
     }
+
+    $purchase = NFTorah\Purchases::Create($purchase, $letters, $request->get_header('X-WP-Nonce'));
+    return ['intent' => $intent, 'purchase' => $purchase];
+}
+
+private function ConfirmPayPalPayment($purchase){
+    $url = getenv('PAYPAL_API_ROOT') . '/checkout/orders/' . $purchase['paymentMethodId'];
+    $args = array(
+        'headers' => array(
+            'Authorization' => 'Bearer ' . getenv('PAYPAL_ACCESS_TOKEN'),
+        ),
+    );
+    
+    $response = wp_remote_get( $url, $args );
+    $paypalPayment = json_decode( wp_remote_retrieve_body($response), true );
+    do_action( 'qm/debug', $paypalPayment );
+
+    return $paypalPayment;
+}
+private function ProcessStripePayment($purchase, $currency, $useStripeSdk){
+
+    $intent = NFTorah\Purchases::PayStripe($purchase['paymentMethodId'], $purchase['paid'], $currency, $useStripeSdk );
 
     switch($intent->status) {
         case "requires_payment_method":
         case "requires_source":
           // Card was not properly authenticated, suggest a new payment method
-          return [
-            'error' => "Your card was denied, please provide a new payment method"
-          ];
+          throw new Exception("Your card was denied, please provide a new payment method");
+
         case "succeeded":
             // Payment is complete, authentication not required
             // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds)
-            $purchase = NFTorah\Purchases::Create($purchase, $letters, $request->get_header('X-WP-Nonce'));
-            return ['intent' => $intent, 'purchase' => $purchase];
+            return $intent;
       }
 }
 
