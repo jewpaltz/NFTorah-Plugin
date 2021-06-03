@@ -136,15 +136,19 @@ const formVue = new Vue({
                 createOrder: (data, actions) => {
                     console.log({paypal_data: data});
                     if (!vm.isValid()) {
-                        return false;
+                        return actions.reject();
                     }
         
                   return actions.order.create({
                     purchase_units: [{
-                      amount: {
-                        value: vm.price
-                      }
-                    }]
+                      amount: { value: vm.price },
+                      description: vm.letters.length + " letters in a special Torah Scroll",
+                      soft_descriptor: "NFTorah Letters",
+                    }],
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING',
+                    }
+                
                   });
                 },
                 onApprove: function(data, actions) {

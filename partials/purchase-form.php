@@ -69,7 +69,7 @@
             </div>
         </article>
         <div id="app-loading">
-        <h1 class="title is-4 has-text-success-dark">Loading ...</h1>
+        <h1 class="title is-4 has-text-success-dark">Loading...</h1>
             <b-skeleton height="80px"></b-skeleton>
             <b-skeleton height="80px"></b-skeleton>
             <b-skeleton height="80px"></b-skeleton>
@@ -136,11 +136,18 @@
 
 </style>
 <script type="application/javascript">
-    const loadingBox = document.getElementById("noscript");
-    loadingBox.classList.add('app-loading');
-    setTimeout(()=>{
-        loadingBox.classList.remove('app-loading');
-    }, 2000)
+    const noscriptBox = document.getElementById("noscript");
+    const loadingTitle = document.querySelector("#app-loading .title");
+    noscriptBox.classList.add('app-loading');
+    let loadingI = 0; 
+    const loadingInterval = setInterval(()=>{
+        loadingI++;
+        loadingTitle.innerHTML = "Loading" + ".".repeat(loadingI);
+        if(loadingI > 16){
+            clearInterval(loadingInterval);
+            loadingBox.classList.remove('app-loading');
+        }
+    }, 500)
 </script>
 <?php
 

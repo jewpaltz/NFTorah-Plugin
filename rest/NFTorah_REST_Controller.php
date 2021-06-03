@@ -128,25 +128,22 @@ public function create_item( $request ) {
     $letters = $request['letters'];
     //print_r([ 'purchase'=> $purchase, 'data'=> $letters]);
 
-    if($purchase['cardNumber'] == "PAYPAL"){
-        $intent = $this->ConfirmPayPalPayment($purchase);
-        if(1==2){   // Error Condition
-            return [ 'error' => 'Paypal payment wasn\'t successful' ];
-        }
-    }else{
         try {
-            $intent = $this->ProcessStripePayment($purchase, $request['currency'] ?? 'usd', $request['useStripeSdk']);
+            if($purchase['cardNumber'] == "PAYPAL"){
+                $intent = $this->ConfirmPayPalPayment($purchase);
+            }else{
+                $intent = $this->ProcessStripePayment($purchase, $request['currency'] ?? 'usd', $request['useStripeSdk']);
+            }   
         } catch (\Throwable $e) {
             return [ 'error' => $e->getMessage() ];
         }        
-    }
 
     $purchase = NFTorah\Purchases::Create($purchase, $letters, $request->get_header('X-WP-Nonce'));
     return ['intent' => $intent, 'purchase' => $purchase];
 }
 
 private function ConfirmPayPalPayment($purchase){
-    $url = getenv('PAYPAL_API_ROOT') . '/checkout/orders/' . $purchase['paymentMethodId'];
+    $url = getenv('PAYPAL_API_ROOT') . 'checkout/orders/' . $purchase['paymentMethodId'];
     $args = array(
         'headers' => array(
             'Authorization' => 'Bearer ' . getenv('PAYPAL_ACCESS_TOKEN'),
@@ -154,8 +151,11 @@ private function ConfirmPayPalPayment($purchase){
     );
     
     $response = wp_remote_get( $url, $args );
+    //print_r($response);
     $paypalPayment = json_decode( wp_remote_retrieve_body($response), true );
-    do_action( 'qm/debug', $paypalPayment );
+    if($paypalPayment['status'] != 'COMPLETED'){
+        throw new Exception('The Paypal transaction did not go through properly');
+    }
 
     return $paypalPayment;
 }
