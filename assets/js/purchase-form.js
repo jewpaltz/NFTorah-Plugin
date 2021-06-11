@@ -190,6 +190,11 @@ const formVue = new Vue({
 
         async cryptoPayment(){
             const vm = this;
+
+            if(!window.ethereum){
+                toastError("You don't have a crypto wallet attached to your browser.");
+            }
+
             if (this.isValid()) {
                 this.isLoading = true;
  

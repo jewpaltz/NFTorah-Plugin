@@ -13,6 +13,7 @@
                 </template>
                 <h1>Buy an entire Verse or Parshah</h1>
             </b-tab-item>
+            <?php /*
             <b-tab-item value="3">
                 <template slot="header">
                     Special Sections
@@ -20,6 +21,7 @@
                 </template>
                 <?php include __DIR__ . '/special-sections-form.php'; ?>
             </b-tab-item>
+            */ ?>
         </b-tabs>
 
         <div class="level">
@@ -33,13 +35,13 @@
 
         <div class="box">
             <small><b>Information of person paying:</b></small>
-            <div class="columns" style="margin-bottom: 0;">
-                <div class="column">
+            <div class="columns" style="margin-bottom: .75rem;">
+                <div class="column" style="padding-bottom: 0;">
                     <b-field label="First Name *" label-position="inside">
                             <b-input v-model="purchase.firstName" id="firstName" required></b-input>
                         </b-field>
                     </div>
-                    <div class="column">
+                    <div class="column" style="padding-bottom: 0;">
                     <b-field label="Last Name *" label-position="inside">
                         <b-input v-model="purchase.lastName" id="lastName" required></b-input>
                     </b-field>
