@@ -19,6 +19,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
 $dotenv->safeLoad();
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+$logger = new Logger('nftorah-log');
+$logger->pushHandler(new StreamHandler( __DIR__ .'/app.log', Logger::DEBUG));
  
 require_once __DIR__ . '/class-NFTorah.php';
 

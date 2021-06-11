@@ -1,8 +1,21 @@
-const contractAddress = "0x123bfCD4ff6B5A1aD7301Fe34256a3b5588bFD3C"; //NFTorah v1
+const contractAddress = "0xab404A6460EB589f3F3CD0BD2aE5280957d8c668"; //NFTorah v1.0.2
+const abi = [
+    //"function mint(address to) public returns (uint256)",
+    "function mint(address to, uint256 tokenId) public",
+    "event Transfer(address indexed from, address indexed to, uint256 indexed value)",
+    "forceTransfer(address to, uint256 tokenId, bytes memory _data)",
+];
 const privateKey = '0x7905d58ec073b68899ca471f12bb80fdd750c692f5be08a90d6cc94c92288785';
 const infura_projectId = '0cbb0f724be040dd85aaf1ed5fbf9fb6';
-const provider = new ethers.providers.InfuraProvider("rinkeby", infura_projectId);
+//  May be altered if user uses MetaMask to pay.
+let provider = new ethers.providers.InfuraProvider("rinkeby", infura_projectId);
+const PROPER_CHAIN_ID = 4;  // Rinkeby
+const PROPER_CHAIN_NAME = 'rinkeby';
 const minter_wallet = new ethers.Wallet(privateKey, provider);
+
+window.ethereum.on('networkChanged', function(networkId){
+    console.log('networkChanged',networkId);
+  });
 
 class Letter {
     hebrewName = "";
@@ -23,6 +36,7 @@ class Purchase {
     expirationDate = null;
     cvv = null;
     paymentMethodId = null;
+    paymentMethod = "CREDIT_CARD";
 }
 
 let wallet = null;
@@ -47,8 +61,9 @@ const formVue = new Vue({
         token_id: null,
         new_address: null,
         transfer_tx: null,
+        one_dollar_in_eth: null,
     }),
-    mounted(){
+    async mounted(){
         this.card_el = setupStripeElements();
         this.$watch('letters.0.hebrewName', (newVal, oldVal)=>{
             if(!this.purchase.firstName || this.purchase.firstName == oldVal){
@@ -67,6 +82,10 @@ const formVue = new Vue({
         })
 
         this.setupPayPalButtons();
+
+        const response  = await fetch('https://api.coinbase.com/v2/exchange-rates?currency=USD')
+        const data = await response.json();
+        this.one_dollar_in_eth = roundCryptoValueString( data.data.rates.ETH );
     },
     methods: {
         addLetter(){
@@ -74,26 +93,6 @@ const formVue = new Vue({
         },
         deleteLetter(i){
             this.letters.splice(i,1);
-        },
-
-        async creditcard(){
-            this.isLoading = true;
-            if (this.isValid()) {
-                try {
-                    const payment_results = await pay_stripe(stripe, this.card_el);
-                    console.log({payment_results});
-                    
-                    this.purchase.cardNumber = payment_results.paymentMethod.card.last4;
-                    this.purchase.expirationDate = payment_results.paymentMethod.card.exp_month + "/" + payment_results.paymentMethod.card.exp_year;
-                    this.purchase.paymentMethodId = payment_results.paymentMethod.id;           
-                } catch (error) {
-                    console.error(error);
-                    toastError(error.message ?? error);
-                    this.isLoading = false;
-                    return;
-                }
-                return this.submitForm();
-            }
         },
 
         isValid(){
@@ -111,12 +110,15 @@ const formVue = new Vue({
         },
         async submitForm(){
 
-            this.purchase.paid = this.price;
             const data = await  NFTorah_api('purchases', {
                 purchase: this.purchase,
                 letters: this.letters
             });
             console.log({data});
+
+            if(data.error){
+                throw data.error;
+            }
 
             this.letters = data.purchase.letters;
             this.purchase.id = data.purchase.purchase_id;
@@ -126,7 +128,28 @@ const formVue = new Vue({
             this.route = "#download-nft";
             this.isSaved = true;
 
-            this.mintNFT();
+        },
+
+        async creditcard(){
+            if (this.isValid()) {
+                this.isLoading = true;
+                try {
+                    const payment_results = await pay_stripe(stripe, this.card_el);
+                    console.log({payment_results});
+                    
+                    this.purchase.cardNumber = payment_results.paymentMethod.card.last4;
+                    this.purchase.expirationDate = payment_results.paymentMethod.card.exp_month + "/" + payment_results.paymentMethod.card.exp_year;
+                    this.purchase.paymentMethodId = payment_results.paymentMethod.id;           
+                    this.purchase.paid = this.price;
+                    await this.submitForm();
+                    await this.mintToBurner();
+                } catch (error) {
+                    console.error(error);
+                    toastError(error.message ?? error);
+                    this.isLoading = false;
+                    return;
+                }
+            }
         },
 
         setupPayPalButtons(){
@@ -151,52 +174,88 @@ const formVue = new Vue({
                 
                   });
                 },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        console.log({paypal_details: details});
-                        vm.purchase.cardNumber = "PAYPAL";
-                        vm.purchase.paymentMethodId = details.id
-                        return vm.submitForm();
-                    });
+                onApprove: async function(data, actions) {
+                    const details = await actions.order.capture();
+                    console.log({ details });
+
+                    //vm.purchase.cardNumber = "PAYPAL";
+                    vm.purchase.cardNumber = details.id;
+                    vm.purchase.paymentMethodId = details.id;
+                    vm.purchase.paid = vm.price;
+                    await vm.submitForm();
+                    await vm.mintToBurner();
                 }
-              }).render('#paypal-button-container'); // Display payment options on your web page
+            }).render('#paypal-button-container'); // Display payment options on your web page
         },
 
-        async saveCryptoInfo(token_id, wallet_address, mnemonic, wallet_private_key){
+        async cryptoPayment(){
+            const vm = this;
+            if (this.isValid()) {
+                this.isLoading = true;
+ 
+                // Metamask injects as window.ethereum into each page
+                await ethereum.request({ method: 'eth_requestAccounts' });
+                await window.ethereum.enable()
+                const mm_provider = await new ethers.providers.Web3Provider(window.ethereum);
+                console.log({mm_provider});
+                try {
+                    const network = await mm_provider.getNetwork( );
+                    if(network.chainId != PROPER_CHAIN_ID){
+                        throw `Your crypto wallet is set to ${network.name}. Please set it to ${PROPER_CHAIN_NAME}`;
+                    }
+
+                    const mm_signer = mm_provider.getSigner();
+
+                    const gwei = ethers.utils.parseEther( this.one_dollar_in_eth) * vm.price ;
+                    const tx = await mm_signer.sendTransaction({
+                        to: contractAddress,
+                        value: gwei
+                    });
+                    const user_address = await mm_signer.getAddress();                    
+                
+                    //vm.purchase.cardNumber = "ETHER";
+                    vm.purchase.cardNumber = tx.hash;
+                    vm.purchase.paymentMethodId = tx.hash;
+                    vm.purchase.publicAddress = tx.from;
+                    vm.purchase.paid = gwei;
+                    await vm.submitForm();
+                    await vm.mintNFT(user_address);
+                } catch (error) {
+                    console.error(error);
+                    toastError(error.message ?? error);
+                    this.isLoading = false;
+                    return;
+                }
+
+            }
+        },
+
+        async saveBurnerWallet(token_id, wallet_address, mnemonic, wallet_private_key){
             const response = await NFTorah_api('purchases/crypto', {
                 token_id, wallet_address, mnemonic, wallet_private_key
             });
         },
-        async mintNFT(){
-            /*
-                1. Create burner wallet
-                2. Mint NFT to burner wallet
-                    a. In the DEBUG version we will gaaaasp... send the private key of the contract owner to the JS in the client
-                    b. For a running on mainnet we will need a solution that keeps the private key secure. probably by doing the signing in php.
-                3. Send the wallet keys & token_id to the server
-                4. Display the info
-            */
-                                
-            const abi = [
-                //"function mint(address to) public returns (uint256)",
-                "function mint(address to) public",
-                "event Transfer(address indexed from, address indexed to, uint256 indexed value)",
-            ];
 
+        async mintToBurner(){
             wallet = ethers.Wallet.createRandom();
             this.mnemonic = wallet.mnemonic;
             this.wallet_address = wallet.address;
 
+            await this.mintNFT(wallet.address);
+        },
+
+        async mintNFT(address){
+
             const contract = new ethers.Contract(contractAddress, abi, provider);
             const contractWithSigner = contract.connect(minter_wallet);
 
-            const filter = contractWithSigner.filters.Transfer(null, wallet.address);
+            const filter = contractWithSigner.filters.Transfer(null, address);
             contractWithSigner.on(filter, (from, to, value, event) => {
                 console.log({ event });
                 this.token_id = value;
             });
 
-            const tx = await contractWithSigner.mint(wallet.address);
+            const tx = await contractWithSigner.mint(address);
             // The operation is NOT complete yet; we must wait until it is mined
             // const mined_tx = await tx.wait();
         },
@@ -247,4 +306,10 @@ const formVue = new Vue({
 
 window.addEventListener('hashchange', function() {
     formVue.route = window.location.hash;
-  }, false);
+ }, false);
+
+function roundCryptoValueString(str, decimalPlaces=18){
+    const arr = (""+str).split(".");
+    const fraction = arr[1] .substr(0, decimalPlaces);
+    return arr[0] + "." + fraction;
+}

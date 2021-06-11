@@ -41,9 +41,13 @@ function toastError(msg){
     if(typeof(msg) == 'Object'){
         msg = JSON.stringify(msg);
     }
+    if(typeof(msg) == 'SyntaxError'){
+        msg = msg.message;
+    }
     Buefy.ToastProgrammatic.open({
         message: msg,
         queue: false,
-        type: 'is-danger'
+        type: 'is-danger',
+        duration: 5000,
     })
 }

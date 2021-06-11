@@ -1,5 +1,6 @@
-<?php 
+<?php
 
+use Monolog\Logger;
 
 class NFTorah_REST_Controller extends WP_REST_Controller {
 
@@ -129,11 +130,19 @@ public function create_item( $request ) {
     //print_r([ 'purchase'=> $purchase, 'data'=> $letters]);
 
         try {
-            if($purchase['cardNumber'] == "PAYPAL"){
-                $intent = $this->ConfirmPayPalPayment($purchase);
-            }else{
-                $intent = $this->ProcessStripePayment($purchase, $request['currency'] ?? 'usd', $request['useStripeSdk']);
-            }   
+            switch ($purchase['paymentMethod']) {
+                case 'PAYPAL':
+                    $intent = $this->ConfirmPayPalPayment($purchase);
+                    break;
+                
+                case 'ETHER':
+                    $intent = $this->ConfirmEtherPayment($purchase);
+                    break;
+                
+                default:
+                    $intent = $this->ProcessStripePayment($purchase, $request['currency'] ?? 'usd', $request['useStripeSdk']);
+                    break;
+            }
         } catch (\Throwable $e) {
             return [ 'error' => $e->getMessage() ];
         }        
@@ -158,6 +167,27 @@ private function ConfirmPayPalPayment($purchase){
     }
 
     return $paypalPayment;
+}
+private function ConfirmEtherPayment($purchase){
+    global $logger;
+
+    $w3 = new JewPaltz\Web3Client();
+    $etherPayment = $w3->GetTransactionByHash($purchase['paymentMethodId']);
+
+    if( strtoupper($etherPayment['from']) != strtoupper($purchase['publicAddress'])){
+        $logger->debug('"from" and "publicAddress" do not match', [gettype($etherPayment['from']), gettype($purchase['publicAddress'])] );
+        throw new Exception('The transaction was not from the correct account');
+    }
+    if(strtoupper($etherPayment['to']) != strtoupper(getenv('CONTRACT_ADDRESS'))){
+        throw new Exception('The transaction was not PAID TO the correct account');
+    }
+
+    if(hexdec($etherPayment['value']) < $purchase['price']){
+        $logger->debug('That\'s not enough money', [$etherPayment['value'], hexdec($etherPayment['value']), $purchase['price']] );
+        throw new Exception('That\'s not enough money');
+    }
+
+    return $etherPayment;
 }
 private function ProcessStripePayment($purchase, $currency, $useStripeSdk){
 

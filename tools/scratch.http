@@ -33,3 +33,40 @@ content-type: application/x-www-form-urlencoded
 grant_type=client_credentials
 
 ###
+https://api.coinbase.com/v2/exchange-rates?currency=USD
+
+###
+https://api.binance.com/api/v3/avgPrice?symbol=ETHTUSD
+
+###
+POST https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2
+Content-Type: application/json
+X-REQUEST-TYPE: GraphQL
+
+query ($tokenAddress: Bytes!) {
+    token( id: $tokenAddress ) {
+        derivedETH
+    }
+}
+
+
+ // Dai
+{
+    "tokenAddress": "0x6b175474e89094c44da98b954eedeac495271d0f"
+}
+
+###
+https://api.etherscan.io/api?module=transaction&action=getstatus&txhash=0x8fc68f679f56c206e49425d4a805a463f93b8cda6170bad4708be3d993ca408c&apikey=RFV1SSHHYKCMXR5PXXB1ZWIYVQM7DU2PDY
+
+###
+https://api.etherscan.io/api?module=account&action=balance&address=0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae&tag=latest&apikey=RFV1SSHHYKCMXR5PXXB1ZWIYVQM7DU2PDY
+
+###
+POST https://rinkeby.infura.io/v3/0cbb0f724be040dd85aaf1ed5fbf9fb6
+
+{
+    "id":0,
+    "jsonrpc":"2.0",
+    "method":"eth_getTransactionByHash",
+    "params":["0xafc2df606c88fc254e73bf65bb034a5d7fd2f01ddc3f3033beb0828b06e5f3e5"]
+}

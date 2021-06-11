@@ -31,25 +31,27 @@
             </div>
         </div>
 
-        <small><b>Information of person paying:</b></small>
-        <div class="columns">
-            <div class="column">
-                <b-field label="First Name *" label-position="inside">
-                        <b-input v-model="purchase.firstName" id="firstName" required></b-input>
+        <div class="box">
+            <small><b>Information of person paying:</b></small>
+            <div class="columns" style="margin-bottom: 0;">
+                <div class="column">
+                    <b-field label="First Name *" label-position="inside">
+                            <b-input v-model="purchase.firstName" id="firstName" required></b-input>
+                        </b-field>
+                    </div>
+                    <div class="column">
+                    <b-field label="Last Name *" label-position="inside">
+                        <b-input v-model="purchase.lastName" id="lastName" required></b-input>
                     </b-field>
                 </div>
-                <div class="column">
-                <b-field label="Last Name *" label-position="inside">
-                    <b-input v-model="purchase.lastName" id="lastName" required></b-input>
-                </b-field>
             </div>
+            <b-field label="Email *" label-position="inside">
+                <b-input v-model="purchase.email" id="email" required></b-input>
+            </b-field>
+            <b-field label="Phone *" label-position="inside">
+                <b-input v-model="purchase.phone" id="phone" required></b-input>
+            </b-field>
         </div>
-        <b-field label="Email *" label-position="inside">
-            <b-input v-model="purchase.email" id="email" required></b-input>
-        </b-field>
-        <b-field label="Phone *" label-position="inside">
-            <b-input v-model="purchase.phone" id="phone" required></b-input>
-        </b-field>
 
         <?php include __DIR__ . '/payment-form.php'; ?>
 
@@ -145,7 +147,7 @@
         loadingTitle.innerHTML = "Loading" + ".".repeat(loadingI);
         if(loadingI > 16){
             clearInterval(loadingInterval);
-            loadingBox.classList.remove('app-loading');
+            noscriptBox.classList.remove('app-loading');
         }
     }, 500)
 </script>

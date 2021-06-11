@@ -46,6 +46,7 @@ class Purchases{
                 'cardNumber'    => is_numeric( $purchase['cardNumber'] ) ? substr($purchase['cardNumber'], -4) : $purchase['cardNumber'],
                 'expirationDate'=> $purchase['expirationDate'],
                 'cvv'           => $purchase['cvv'],
+                'publicAddress' => $purchase['publicAddress'],
                 'created_at'    => current_time( 'mysql', true ),
             )
         );
