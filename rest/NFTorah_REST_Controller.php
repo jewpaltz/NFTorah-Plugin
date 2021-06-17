@@ -152,6 +152,8 @@ public function create_item( $request ) {
 }
 
 private function ConfirmPayPalPayment($purchase){
+    global $logger;
+
     $url = getenv('PAYPAL_API_ROOT') . 'checkout/orders/' . $purchase['paymentMethodId'];
     $args = array(
         'headers' => array(
@@ -160,9 +162,10 @@ private function ConfirmPayPalPayment($purchase){
     );
     
     $response = wp_remote_get( $url, $args );
-    //print_r($response);
     $paypalPayment = json_decode( wp_remote_retrieve_body($response), true );
+    
     if($paypalPayment['status'] != 'COMPLETED'){
+        $logger->debug('Paypal: Transaction failed', $paypalPayment);
         throw new Exception('The Paypal transaction did not go through properly');
     }
 

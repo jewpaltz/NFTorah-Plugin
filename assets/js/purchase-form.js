@@ -3,7 +3,7 @@ const abi = [
     //"function mint(address to) public returns (uint256)",
     "function mint(address to, uint256 tokenId) public",
     "event Transfer(address indexed from, address indexed to, uint256 indexed value)",
-    "forceTransfer(address to, uint256 tokenId, bytes memory _data)",
+    "forceTransfer(address to, uint256 tokenId, bytes _data)",
 ];
 const privateKey = '0x7905d58ec073b68899ca471f12bb80fdd750c692f5be08a90d6cc94c92288785';
 const infura_projectId = '0cbb0f724be040dd85aaf1ed5fbf9fb6';
@@ -58,7 +58,7 @@ const formVue = new Vue({
         wallet_address: null,
         json_wallet: null,
         contract_address: contractAddress,
-        token_id: null,
+        token_ids: [],
         new_address: null,
         transfer_tx: null,
         one_dollar_in_eth: null,
@@ -235,9 +235,9 @@ const formVue = new Vue({
             }
         },
 
-        async saveBurnerWallet(token_id, wallet_address, mnemonic, wallet_private_key){
+        async saveBurnerWallet(purchase_id, wallet_address, mnemonic, wallet_private_key){
             const response = await NFTorah_api('purchases/crypto', {
-                token_id, wallet_address, mnemonic, wallet_private_key
+                purchase_id, wallet_address, mnemonic, wallet_private_key
             });
         },
 
@@ -257,10 +257,13 @@ const formVue = new Vue({
             const filter = contractWithSigner.filters.Transfer(null, address);
             contractWithSigner.on(filter, (from, to, value, event) => {
                 console.log({ event });
-                this.token_id = value;
+                this.token_ids.push(value);
             });
 
-            const tx = await contractWithSigner.mint(address);
+            for (const letter of this.letters) {
+                const tx = await contractWithSigner.mint(address, letter.id);
+                console.log({tx})
+            }
             // The operation is NOT complete yet; we must wait until it is mined
             // const mined_tx = await tx.wait();
         },
@@ -282,8 +285,10 @@ const formVue = new Vue({
             });
             */
 
-            this.transfer_tx = await contractWithSigner.safeTransferFrom(wallet.address, this.new_address, this.token_id);
-            this.transfer_tx = await this.transfer_tx.wait();
+            for (const token_id of this.token_ids) {
+                this.transfer_tx = await contractWithSigner.safeTransferFrom(wallet.address, this.new_address, token_id);
+                this.transfer_tx = await this.transfer_tx.wait();                
+            }
         },
         async encryptWallet(){
             this.json_wallet = 'processing';

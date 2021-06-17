@@ -24,10 +24,10 @@ Referer: http://localhost:8001/purchase-a-letter/
 https://api.sandbox.paypal.com/v2/checkout/orders/26N34189BD452215B
 
 ###
-POST https://api.paypal.com/v1/oauth2/token
+POST https://api-m.sandbox.paypal.com/v1/oauth2/token
 accept: application/json
 accept-language: en_US
-authorization: basic 
+Authorization: Basic QVNrc01kLUhtMFFKTkJ3bUY4ZllFY0F4ZV8xNG5jcWRzWGdrSUxXdEdldzBPMnM0SVFZUFpHcUp6SWpvSk56X2FDcDIwaG1ISVE1MWNWZTg6RUxFSU8xSm5jb295eHNRZmkyNHJWSEU1YmxGdHVoVGRRaG1jeFBPY25UbF9FQ21yS0Q1RFppN0dndnhYMVo3LTNnUDBEWUJXMGMzVVVGR0E=
 content-type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
