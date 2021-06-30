@@ -2,7 +2,7 @@
 
 use Monolog\Logger;
 
-class NFTorah_REST_Controller extends WP_REST_Controller {
+class NFTorah_Purchases_REST_Controller extends WP_REST_Controller {
 
 
 /**

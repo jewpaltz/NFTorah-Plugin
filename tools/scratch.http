@@ -21,6 +21,9 @@ Referer: http://localhost:8001/purchase-a-letter/
 }
 
 ###
+GET http://localhost:8001/wp-json/NFTorah/v1/torah/parshiot
+
+###
 https://api.sandbox.paypal.com/v2/checkout/orders/26N34189BD452215B
 
 ###

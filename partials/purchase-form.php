@@ -11,7 +11,7 @@
                     Verses & Sections
                     <img class="icon" style="height: 20px; width: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
                 </template>
-                <h1>Buy an entire Verse or Parshah</h1>
+                <?php include __DIR__ . '/verses.php'; ?>
             </b-tab-item>
             <?php /*
             <b-tab-item value="3">
@@ -130,6 +130,12 @@
     .subtitle {
         margin-top: 0 !important;
         margin-bottom: .5rem !important;
+    }
+
+    .table-form td{
+        white-space: nowrap;
+        flex-direction: column;
+        justify-content: center;
     }
 
     @media (max-width: 767px){

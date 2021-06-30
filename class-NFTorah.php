@@ -4,9 +4,11 @@
 */
 require_once __DIR__ . '/data/web3-client.php';
 require_once __DIR__ . '/data/class-purchases.php';
+require_once __DIR__ . '/data/class-torah.php';
 require_once __DIR__ . '/admin/class-options-page.php';
 require_once __DIR__ . '/setup/class-setup.php';
-require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
+require_once __DIR__ . '/rest/NFTorah_Purchases_REST_Controller.php';
+require_once __DIR__ . '/rest/NFTorah_Torah_REST_Controller.php';
 
     class NFTorah{
 
@@ -22,7 +24,9 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
         public static function Init(){
             NFTorah_setup::update_001_create_original_tables();
             NFTorah_setup::update_003_allow_exp_and_cvv_null();
-
+            NFTorah_setup::update_004_record_which_letter();
+            NFTorah_setup::update_006_create_pesukim_table();
+            NFTorah_setup::update_007_import_pesukim_data();
 
             self::RegisterPublicHooks();      
             do_action( 'qm/debug', 'NFTorah Initialized' );
@@ -33,8 +37,10 @@ require_once __DIR__ . '/rest/NFTorah_REST_Controller.php';
         }
 
         public static function RestApiInit(){
-            $restController = new NFTorah_REST_Controller();
-            $restController->register_routes();
+            $purchaseRestController = new NFTorah_Purchases_REST_Controller();
+            $purchaseRestController->register_routes();
+            $torahRestController = new NFTorah_Torah_REST_Controller();
+            $torahRestController->register_routes();
         }
 
         public static function AdminMenu(){

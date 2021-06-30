@@ -45,6 +45,7 @@ const formVue = new Vue({
     el: '#postbox',
     data: ()=>({
         letters: [new Letter()],
+        verses: new Letter(),
         activeItemTab: "1",
         activePaymentTab: "1",
         isSaved: false,
