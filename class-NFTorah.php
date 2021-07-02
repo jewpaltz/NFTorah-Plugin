@@ -97,6 +97,7 @@ require_once __DIR__ . '/rest/NFTorah_Torah_REST_Controller.php';
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'STRIPE_PUB_KEY' => getenv('STRIPE_PUB_KEY'),
+                'CONTRACT_ADDRESS' => getenv('CONTRACT_ADDRESS'),
             ) );
             wp_localize_script( 'stripe-payment', 'paymentKeys', array(
                 

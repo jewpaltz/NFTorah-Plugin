@@ -1,4 +1,4 @@
-const contractAddress = "0xab404A6460EB589f3F3CD0BD2aE5280957d8c668"; //NFTorah v1.0.2
+const contractAddress = wpApiSettings.CONTRACT_ADDRESS; //NFTorah
 const abi = [
     //"function mint(address to) public returns (uint256)",
     "function mint(address to, uint256 tokenId) public",
@@ -46,6 +46,7 @@ const formVue = new Vue({
     data: ()=>({
         letters: [new Letter()],
         verses: new Letter(),
+        verses_count: 0,
         activeItemTab: "1",
         activePaymentTab: "1",
         isSaved: false,
