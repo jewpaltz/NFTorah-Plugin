@@ -24,8 +24,15 @@ class Purchases{
         return $data;
     }
 
-    public static function Create($purchase, $letters, $nonce){
+    public static function GetLetter($id){
         global $wpdb;
+
+        $letter = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}torah_letter WHERE purchase_id=%d", $id), 'ARRAY_A');
+        return $letter;
+    }
+
+    public static function Create($purchase, $letters, $nonce){
+        global $wpdb, $logger;
     
         $errors = [];
         $results = [];
@@ -59,24 +66,49 @@ class Purchases{
 
         foreach ($letters as $key => $letter) {
             //TODO: find actual letter and record details about it. letter, parshah, etc.
-            $wpdb->insert(
-                $wpdb->prefix . 'torah_letter',
-                array(
+            $sql = "
+            SELECT * FROM {$wpdb->prefix}torah_pesukim WHERE taken < length ORDER BY id LIMIT 1
+            ";
+            $posuk = $wpdb->get_row($wpdb->prepare($sql), 'ARRAY_A');
+
+            $wpdb->query( "UPDATE {$wpdb->prefix}torah_pesukim SET taken=taken+1 WHERE id=$posuk[id]" );
+
+            $taken = $posuk['taken'];
+            $posukText = $posuk['text'];
+
+            $newLetter = [
                     'purchase_id'   => $purchase_id,
                     'hebrewName'    => $letter['hebrewName'],
                     'secularName'   => $letter['secularName'],
                     'lastName'      => $letter['lastName'],
                     'mothersName'   => $letter['mothersName'],
+                    
+                    'book'          => $posuk['book'],
+                    'chapter'       => $posuk['chapter'],
+                    'verse'         => $posuk['verse'],
+                    'letter'        => $taken,
+                    'hebrew_Letter'  => mb_substr($posukText, $taken, 1),
+                    'parshah'       => $posuk['parshah_heb'],
+                    
                     'created_at'    => current_time( 'mysql', true ),
-                )
-            );
+            ];
+            
+            $wpdb->insert( $wpdb->prefix . 'torah_letter', $newLetter);
+
             if($wpdb->last_error){
                 $errors[] = $wpdb->last_error;
+                $logger->error($wpdb->last_error);
             }
             $results[] = $wpdb->last_result;
-            $letters[$key]["id"] = $wpdb->insert_id;
+            $newLetter["id"] = $wpdb->insert_id;
 
-            $letters[$key]["certificateUrl"] = self::CreateCertificate($purchase, $letters[$key]);  // Saves an image and returns the url
+            $newLetter["certificateUrl"] = self::CreateCertificate($purchase, $newLetter);  // Saves an image and returns the url
+        
+            $letters[$key] = $newLetter;
+
+            //$logger->debug('NFTorah::CreatePurchase: ClientLetter',  $letters[$key]);
+            //$logger->debug('NFTorah::CreatePurchase: DBLetter',  $newLetter);
+            
         }
 
         return [
@@ -94,7 +126,6 @@ class Purchases{
             $certificate_url = "{$upload_dir['baseurl']}/torah-certificates";
             if ( ! file_exists( $certificate_dir ) ) {
                 wp_mkdir_p( $certificate_dir );
-
             }
             
             $img = imagecreatefrompng(__DIR__ . '/../assets/blank-certificate.png');
@@ -103,8 +134,8 @@ class Purchases{
             $font = __DIR__ . "/../assets/Courgette-Regular.ttf"; 
             $hebrewFont = __DIR__ . "/../assets/DavidLibre-Bold.ttf"; 
 
-            $parshah_name = self::mb_strrev('לך לך');
-            $txt = hebrev('ז in the Parshah ' . $parshah_name);
+            $parshah_name = self::mb_strrev($letter['parshah']);
+            $txt = hebrev($letter['hebrew_Letter'] . ' in the Parshah ' . $parshah_name);
             $centerX = self::centerTextX( $hebrewFont, 48, $txt, imagesx($img) );
             imagettftext($img, 48, 0, $centerX, 550, $black, $hebrewFont, $txt);
 
@@ -151,5 +182,28 @@ class Purchases{
             $r .= mb_substr($str, $i, 1);
         }
         return $r;
+    }
+
+    public static function GetMetaData($id){
+        $upload_dir   = wp_upload_dir();
+        $certificate_url = "{$upload_dir['baseurl']}/torah-certificates";
+
+        $letter = self::GetLetter($id);
+        return [
+            "name" => "NFTorah Letter #" . $id,
+            "description" => 'This NFT represents one letter written in a physical Torah for the original owner of this token. '
+                        .    'The last name of the owner and the exact letter are not kept on chain to increase the anonymity of all involved. '
+                        .    'However the NFTorah authority keeps records for this letter #' . $id,
+            "image" => "$certificate_url/$id.png",
+            "external_link" => site_url( 'letters/' . $id),
+            "attributes" => [
+                [ 
+                    "hebrew name" => $letter['hebrewName'],
+                    "hebrew letter" => $letter['hebrew_Letter'],
+                    'book' => $letter['book'],
+                    'parshah' => $letter['parshah'],
+                ]
+            ]
+        ];
     }
 }

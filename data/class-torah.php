@@ -52,7 +52,7 @@ class Torah {
                 $x = str_replace(' ', '', $text);
                 $eng = str_replace('\'', '\\\'', $parshah['eng']);
                 $heb = str_replace('\'', '\\\'', $parshah['heb']);
-                $len = strlen($x);
+                $len = mb_strlen($x);
 
                 $pesukim[] = "( null, '$book', '$chapter', '$verse', $len, 0, '$x', '$eng', '$heb' ) ";
             }

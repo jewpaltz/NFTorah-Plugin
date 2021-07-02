@@ -7,19 +7,19 @@
             </div>
             <div class="column" style="padding-top: 0; padding-bottom: .25rem;">
                 <b-field label="Secular Name" label-position="inside" message="Required, if you don't provide a Hebrew Name.">
-                    <b-input v-model="verses.secularName" id="secularName" :required="!verses.hebrewName"></b-input>
+                    <b-input v-model="verses.secularName" id="secularName" :required="verses_count > 0 && !verses.hebrewName"></b-input>
                 </b-field>
             </div>
         </div>
         <div class="columns"  style="margin: 0;">
             <div class="column" style="padding-top: 0; padding-bottom: .25rem;">
             <b-field label="Last Name"  label-position="inside" >
-                    <b-input v-model="verses.lastName" id="lastName" required></b-input>
+                    <b-input v-model="verses.lastName" id="lastName" :required="verses_count > 0"></b-input>
                 </b-field>
             </div>
             <div class="column" style="padding-top: 0; padding-bottom: .25rem;">
                 <b-field  label="Mother's Name" label-position="inside" message="Hebrew if you know it, secular if you don't">
-                    <b-input v-model="verses.mothersName" id="mothersName" required></b-input>
+                    <b-input v-model="verses.mothersName" id="mothersName" :required="verses_count > 0"></b-input>
                 </b-field>
             </div>
         </div>
@@ -33,7 +33,7 @@
             <td><div class="control">
                     <input class="input " type="number" v-model="verses_count">
                 </div></td>
-            <td>= ${{model_count * 18}}</td>
+            <td>= ${{verses_count * 18}}</td>
         </tr>
         </table>
 

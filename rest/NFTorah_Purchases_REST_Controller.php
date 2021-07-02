@@ -1,6 +1,7 @@
 <?php
 
 use Monolog\Logger;
+use NFTorah\Purchases;
 
 class NFTorah_Purchases_REST_Controller extends WP_REST_Controller {
 
@@ -66,25 +67,22 @@ public function register_routes() {
     ) );
     register_rest_route( $namespace, '/metadata' . '/(?P<id>[\d]+)', array(
         array(
-            'methods'         => WP_REST_Server::READABLE,
-            'callback'        => array( $this, 'get_metadata' ),
+            'methods'   => WP_REST_Server::READABLE,
+            'callback'  => array( $this, 'get_metadata' ),
             'permission_callback' => '__return_true',
-            'args'            => array(
-                'context'          => array(
-                    'default'      => 'view',
-                    'required'     => true,
-                ),
-                'params' => array(
-                    'required'     => false,
-                    'id' => array(
+            'args'  => [
+                'context'=> [ 'default' => 'view', 'required' => true, ],
+                'params' => [
+                    'required' => false,
+                    'id' => [
                         'description'        => 'The id of the letter in the NFT',
                         'type'               => 'integer',
                         'default'            => 1,
                         'sanitize_callback'  => 'absint',
-                    ),
-                ),
+                    ],
+                ],
                 $this->get_collection_params()
-            ),
+            ],
         ),
     ) );
     /*
@@ -103,8 +101,7 @@ public function register_routes() {
  * @return WP_Error|WP_REST_Response
  */
 public function get_items( $request ) {
-    return ['Purchase 1', 'Purchase 2'];
-    
+    return Purchases::GetList();
 }
 
 /**
@@ -236,18 +233,7 @@ public function delete_item( $request ) {
  * @return WP_Error|WP_REST_Response
  */
 public function get_metadata( $request ) {
-    return [
-        "name" => "NFTorah Letter #" . $request['id'],
-        "description" => "This NFT represents one letter written in a physical Torah for the original owner of this token. The name of the owner and the exact letter are not kept on chain to increase the anonymity of all involved. However the NFTorah authority keeps records for this letter #" . $request['id'],
-        "image" => "https://zaidyla.com/wp-content/uploads/2021/05/NFTorah-Certificate-Placeholder.png",
-        "external_link" => "https://zaidyla.com/letters/" . $request['id'],
-        "attributes" => [
-            [ 
-                "first name" => "Moshe",
-                "mothers name" => "Shoshanah Beila",
-            ]
-        ]
-    ];
+    return Purchases::GetMetaData($request['id']);
 }
 
 /**
@@ -257,7 +243,7 @@ public function get_metadata( $request ) {
  * @return WP_Error|bool
  */
 public function get_items_permissions_check( $request ) {
-    return true;
+    return current_user_can( 'edit_posts' );;
 }
 
 /**
@@ -277,6 +263,7 @@ public function get_item_permissions_check( $request ) {
  * @return WP_Error|bool
  */
 public function create_item_permissions_check( $request ) {
+    // Anyone can buy a letter
     return true;
 }
 
@@ -287,7 +274,7 @@ public function create_item_permissions_check( $request ) {
  * @return WP_Error|bool
  */
 public function update_item_permissions_check( $request ) {
-    return $this->create_item_permissions_check( $request );
+    return current_user_can( 'edit_posts' );
 }
 
 /**
@@ -297,7 +284,7 @@ public function update_item_permissions_check( $request ) {
  * @return WP_Error|bool
  */
 public function delete_item_permissions_check( $request ) {
-    return $this->create_item_permissions_check( $request );
+    return current_user_can( 'edit_posts' );
 }
 
 /**
