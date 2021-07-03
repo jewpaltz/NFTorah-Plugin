@@ -87,4 +87,113 @@ class NFTorah_setup {
 
         update_option( "NFTorah_db_version", $DB_VERSION );
     }
+
+    public static function update_004_record_which_letter() {
+		global $wpdb, $logger;
+        $DB_VERSION = 1.34;
+
+        if((float)get_option('NFTorah_db_version') >= $DB_VERSION){
+            do_action( 'qm/debug', 'NFTorah DB structure Up To Date!' );
+            return;
+        }
+
+        $sql =  "ALTER TABLE {$wpdb->prefix}torah_letter "
+            .   " ADD `book` VARCHAR(20) NULL, "
+            .   " ADD `chapter` INT NULL, "
+            .   " ADD `verse` INT NULL, "
+            .   " ADD `letter` INT NULL, "
+            .   " ADD `hebrew_letter` VARCHAR(20) NULL, "
+            .   " ADD `parshah` VARCHAR(50) NULL;";
+        
+        
+        $logger->debug('NFTorah::setup: Executing', [ $sql ]);
+        $wpdb->query($sql);
+
+        if($wpdb->last_error){
+            $logger->debug('NFTorah::setup: Error', [ $wpdb->last_error ]);
+            do_action( 'qm/debug', $wpdb->last_error );
+            return;
+        }
+
+        update_option( "NFTorah_db_version", $DB_VERSION );
+    }
+
+    public static function update_006_create_pesukim_table() {
+        $DB_VERSION = 1.36;
+            global $wpdb;
+
+            $charset_collate = $wpdb->get_charset_collate();
+
+            $sql = "
+            CREATE TABLE  {$wpdb->prefix}torah_pesukim (
+                `id` INT NOT NULL AUTO_INCREMENT ,
+                `book` VARCHAR(20) NOT NULL ,
+                `chapter` INT NOT NULL ,
+                `verse` INT NOT NULL ,
+                 `length` INT NOT NULL ,
+                 `taken` INT NOT NULL ,
+                 `text` VARCHAR(500) NOT NULL ,
+                 `parshah` VARCHAR(20) NOT NULL ,
+                 `parshah_heb` VARCHAR(20) NOT NULL ,
+                 PRIMARY KEY (`id`),
+                 INDEX `ix_pesukim_natural` (`book`, `chapter`, `verse` )
+                 ) $charset_collate;
+            ";
+
+        self::do_sql_update($sql, $DB_VERSION, 'update_006_create_pesukim_table');
+
+    }
+
+    public static function update_007_import_pesukim_data() {
+        $DB_VERSION = 1.37;
+
+        self::do_update(function(){
+            global $wpdb, $logger;
+
+            $sql = file_get_contents( __DIR__ . '/pesukim.sql');
+            $header = "INSERT INTO `{$wpdb->prefix}torah_pesukim` ( `id`, `book`, `chapter`, `verse`, `length`, `taken`, `text`, `parshah`, `parshah_heb`) VALUES ";
+            //echo $sql;
+            $wpdb->query($header . $sql);
+
+            if($wpdb->last_error){
+                $logger->debug('NFTorah::setup: Error', [ $wpdb->last_error ]);
+                do_action( 'qm/debug', $wpdb->last_error );
+                return;
+            }
+        }, $DB_VERSION, 'update_007_import_pesukim_data');
+
+    }
+
+    public static function do_sql_update($sql, $db_version, $name) {
+
+        self::do_update(function() use ($sql){
+            global $wpdb, $logger;
+
+            if(strlen($sql) < 1000){
+                $logger->debug('NFTorah::setup: Executing ' . $sql);
+            }
+            
+            $wpdb->query($sql);
+
+            if($wpdb->last_error){
+                $logger->debug('NFTorah::setup: Error', [ $wpdb->last_error ]);
+                do_action( 'qm/debug', $wpdb->last_error );
+                return;
+            }
+        }, $db_version, $name);
+    }
+
+    public static function do_update($fn, $db_version, $name) {
+		global $logger;
+
+        if((float)get_option('NFTorah_db_version') >= $db_version){
+            do_action( 'qm/debug', 'NFTorah DB structure Up To Date!' );
+            return;
+        }
+        $logger->debug('NFTorah::setup: Executing ' . $name);
+
+        $fn();
+
+        update_option( "NFTorah_db_version", $db_version );
+    }
 }

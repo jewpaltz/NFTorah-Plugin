@@ -1,7 +1,9 @@
-<?php 
+<?php
 
+use Monolog\Logger;
+use NFTorah\Purchases;
 
-class NFTorah_REST_Controller extends WP_REST_Controller {
+class NFTorah_Purchases_REST_Controller extends WP_REST_Controller {
 
 
 /**
@@ -65,25 +67,22 @@ public function register_routes() {
     ) );
     register_rest_route( $namespace, '/metadata' . '/(?P<id>[\d]+)', array(
         array(
-            'methods'         => WP_REST_Server::READABLE,
-            'callback'        => array( $this, 'get_metadata' ),
+            'methods'   => WP_REST_Server::READABLE,
+            'callback'  => array( $this, 'get_metadata' ),
             'permission_callback' => '__return_true',
-            'args'            => array(
-                'context'          => array(
-                    'default'      => 'view',
-                    'required'     => true,
-                ),
-                'params' => array(
-                    'required'     => false,
-                    'id' => array(
+            'args'  => [
+                'context'=> [ 'default' => 'view', 'required' => true, ],
+                'params' => [
+                    'required' => false,
+                    'id' => [
                         'description'        => 'The id of the letter in the NFT',
                         'type'               => 'integer',
                         'default'            => 1,
                         'sanitize_callback'  => 'absint',
-                    ),
-                ),
+                    ],
+                ],
                 $this->get_collection_params()
-            ),
+            ],
         ),
     ) );
     /*
@@ -102,8 +101,7 @@ public function register_routes() {
  * @return WP_Error|WP_REST_Response
  */
 public function get_items( $request ) {
-    return ['Purchase 1', 'Purchase 2'];
-    
+    return Purchases::GetList();
 }
 
 /**
@@ -117,7 +115,7 @@ public function get_item( $request ) {
 }
 
 /**
- * Create one item from the collection
+ * Create one Torah Letter Purchase
  *
  * @param WP_REST_Request $request Full data about the request.
  * @return WP_Error|WP_REST_Response
@@ -128,24 +126,83 @@ public function create_item( $request ) {
     $letters = $request['letters'];
     //print_r([ 'purchase'=> $purchase, 'data'=> $letters]);
 
-    try {
-        $intent = NFTorah\Purchases::PayStripe($purchase['paymentMethodId'], $purchase['paid'], $request['currency'] ?? 'usd', $request['useStripeSdk'] );
-    } catch (\Throwable $e) {
-        return [ 'error' => $e->getMessage() ];
+        try {
+            switch ($purchase['paymentMethod']) {
+                case 'PAYPAL':
+                    $intent = $this->ConfirmPayPalPayment($purchase);
+                    break;
+                
+                case 'ETHER':
+                    $intent = $this->ConfirmEtherPayment($purchase);
+                    break;
+                
+                default:
+                    $intent = $this->ProcessStripePayment($purchase, $request['currency'] ?? 'usd', $request['useStripeSdk']);
+                    break;
+            }
+        } catch (\Throwable $e) {
+            return [ 'error' => $e->getMessage() ];
+        }        
+
+    $purchase = NFTorah\Purchases::Create($purchase, $letters, $request->get_header('X-WP-Nonce'));
+    return ['intent' => $intent, 'purchase' => $purchase];
+}
+
+private function ConfirmPayPalPayment($purchase){
+    global $logger;
+
+    $url = getenv('PAYPAL_API_ROOT') . 'checkout/orders/' . $purchase['paymentMethodId'];
+    $args = array(
+        'headers' => array(
+            'Authorization' => 'Bearer ' . getenv('PAYPAL_ACCESS_TOKEN'),
+        ),
+    );
+    
+    $response = wp_remote_get( $url, $args );
+    $paypalPayment = json_decode( wp_remote_retrieve_body($response), true );
+    
+    if($paypalPayment['status'] != 'COMPLETED'){
+        $logger->debug('Paypal: Transaction failed', $paypalPayment);
+        throw new Exception('The Paypal transaction did not go through properly');
     }
+
+    return $paypalPayment;
+}
+private function ConfirmEtherPayment($purchase){
+    global $logger;
+
+    $w3 = new JewPaltz\Web3Client();
+    $etherPayment = $w3->GetTransactionByHash($purchase['paymentMethodId']);
+
+    if( strtoupper($etherPayment['from']) != strtoupper($purchase['publicAddress'])){
+        $logger->debug('"from" and "publicAddress" do not match', [gettype($etherPayment['from']), gettype($purchase['publicAddress'])] );
+        throw new Exception('The transaction was not from the correct account');
+    }
+    if(strtoupper($etherPayment['to']) != strtoupper(getenv('CONTRACT_ADDRESS'))){
+        throw new Exception('The transaction was not PAID TO the correct account');
+    }
+
+    if(hexdec($etherPayment['value']) < $purchase['price']){
+        $logger->debug('That\'s not enough money', [$etherPayment['value'], hexdec($etherPayment['value']), $purchase['price']] );
+        throw new Exception('That\'s not enough money');
+    }
+
+    return $etherPayment;
+}
+private function ProcessStripePayment($purchase, $currency, $useStripeSdk){
+
+    $intent = NFTorah\Purchases::PayStripe($purchase['paymentMethodId'], $purchase['paid'], $currency, $useStripeSdk );
 
     switch($intent->status) {
         case "requires_payment_method":
         case "requires_source":
           // Card was not properly authenticated, suggest a new payment method
-          return [
-            'error' => "Your card was denied, please provide a new payment method"
-          ];
+          throw new Exception("Your card was denied, please provide a new payment method");
+
         case "succeeded":
             // Payment is complete, authentication not required
             // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds)
-            $purchase = NFTorah\Purchases::Create($purchase, $letters, $request->get_header('X-WP-Nonce'));
-            return ['intent' => $intent, 'purchase' => $purchase];
+            return $intent;
       }
 }
 
@@ -176,18 +233,7 @@ public function delete_item( $request ) {
  * @return WP_Error|WP_REST_Response
  */
 public function get_metadata( $request ) {
-    return [
-        "name" => "NFTorah Letter #" . $request['id'],
-        "description" => "This NFT represents one letter written in a physical Torah for the original owner of this token. The name of the owner and the exact letter are not kept on chain to increase the anonymity of all involved. However the NFTorah authority keeps records for this letter #" . $request['id'],
-        "image" => "https://zaidyla.com/wp-content/uploads/2021/05/NFTorah-Certificate-Placeholder.png",
-        "external_link" => "https://zaidyla.com/letters/" . $request['id'],
-        "attributes" => [
-            [ 
-                "first name" => "Moshe",
-                "mothers name" => "Shoshanah Beila",
-            ]
-        ]
-    ];
+    return Purchases::GetMetaData($request['id']);
 }
 
 /**
@@ -197,7 +243,7 @@ public function get_metadata( $request ) {
  * @return WP_Error|bool
  */
 public function get_items_permissions_check( $request ) {
-    return true;
+    return current_user_can( 'edit_posts' );;
 }
 
 /**
@@ -217,6 +263,7 @@ public function get_item_permissions_check( $request ) {
  * @return WP_Error|bool
  */
 public function create_item_permissions_check( $request ) {
+    // Anyone can buy a letter
     return true;
 }
 
@@ -227,7 +274,7 @@ public function create_item_permissions_check( $request ) {
  * @return WP_Error|bool
  */
 public function update_item_permissions_check( $request ) {
-    return $this->create_item_permissions_check( $request );
+    return current_user_can( 'edit_posts' );
 }
 
 /**
@@ -237,7 +284,7 @@ public function update_item_permissions_check( $request ) {
  * @return WP_Error|bool
  */
 public function delete_item_permissions_check( $request ) {
-    return $this->create_item_permissions_check( $request );
+    return current_user_can( 'edit_posts' );
 }
 
 /**

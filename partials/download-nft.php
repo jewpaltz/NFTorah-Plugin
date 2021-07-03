@@ -7,20 +7,28 @@
     <div class="message-body">
         <h5 class="title is-5">View your token on OpenSea</h5>
         <div>
-            You can view your Torah Token on the worlds largest NFT marketplace.
-            <h6 v-show="!token_id">
+            You can view your Torah Tokens on the worlds largest NFT marketplace.
+            <h6 v-show="!token_ids.length">
                 As soon as your NFT is finished being minted a link will show up right here.
                 <b-skeleton ></b-skeleton>
             </h6>
-            <div v-show="token_id">
+            <div v-show="token_ids.length">
                 <b>Just make sure to return to this page to claim your ownership.</b>
-                <a :href="`https://testnets.opensea.io/assets/${contract_address}/${token_id}`" target="_blank">View My Token</a>
+                <ul style="margin: 1rem 0 0 0;">
+                    <li v-for="token_id in token_ids" :key="token_id">
+                        <a :href="`https://testnets.opensea.io/assets/${contract_address}/${token_id}`" target="_blank">View Token #{{token_id}}</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 
-<img :src="`https://zaidyla.com/wp-content/uploads/2021/05/NFTorah-Certificate-Placeholder.png`" width="50%" /> <!-- will be dynamic for each letter eventually -->
+<div class="image" v-for="letter in letters" :key="letter.id" style="width: 50%;">
+    <a :href="letter.certificateUrl" target="_blank">
+        <img :src="letter.certificateUrl" width="50%"  /> 
+    </a>
+</div>
 
 <h4 class="subtitle is-4">
     Blockchain is powerful. But it doesn't need to be difficult.
