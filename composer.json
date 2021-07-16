@@ -8,17 +8,7 @@
         }
     ],
     "minimum-stability": "dev",
-    "autoload": {
-        "psr-4": {
-          "Ethereum\\": "src/"
-        }
-      },
-      "repositories": [
-        {
-          "type": "git",
-          "url": "https://github.com/digitaldonkey/ethereum-php.git"
-        }
-      ],
+
       "require": {
         "digitaldonkey/ethereum-php": "master",
         "vlucas/phpdotenv": "5.3.0",
