@@ -23,24 +23,31 @@
                 </b-field>
             </div>
         </div>
+        <div class="columns"  style="margin: 0;">
+            <div class="column">
 
-        <table class="table">
-        <tr class="table-form">
-            <td>
-                <label class="label field-label">Verses</label>
-            </td>
-            <td>$18 x</td>
-            <td><div class="control">
-                    <input class="input " type="number" v-model="verses_count">
-                </div></td>
-            <td>= ${{verses_count * 18}}</td>
-        </tr>
-        </table>
+                <b-field>
+                    <p class="control">
+                        <label class="button is-static">Verses</label>
+                    </p>
+                    <b-input  type="number" v-model="verses_count" expanded></b-input>
+                    <p class="control">
+                        <span class="button is-static">x $18 = ${{verses_count * 18}}</span>
+                    </p>
+                </b-field>
+            </div>
+            <div class="column">
 
-        <div class="field is-horizontal">
-                
-                <p></p>
-                
-                <p></p>
+                <b-field>
+                    <p class="control">
+                        <label class="button is-static">Chapters</label>
+                    </p>
+                    <b-input  type="number" v-model="chapters_count" expanded></b-input>
+                    <p class="control">
+                        <span class="button is-static">x $360 = ${{chapters_count * 360}}</span>
+                    </p>
+                </b-field>
+            </div>
         </div>
+        
     </div>
