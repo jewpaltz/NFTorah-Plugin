@@ -47,6 +47,7 @@ const formVue = new Vue({
         letters: [new Letter()],
         verses: new Letter(),
         verses_count: 0,
+        chapters_count: 0,
         activeItemTab: "1",
         activePaymentTab: "1",
         isSaved: false,
