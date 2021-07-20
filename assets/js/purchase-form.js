@@ -302,7 +302,7 @@ const formVue = new Vue({
     },
     computed:{
         price(){ // paid
-            return this.letters.length;
+            return this.letters.length + this.verses_count * 18 + this.chapters_count * 360;
         },
         page(){
             return this.route.includes("download-nft")  ? //|| this.isSaved
