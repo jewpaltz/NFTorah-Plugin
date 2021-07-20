@@ -3,8 +3,6 @@ name: PHP Composer
 on:
   push:
     branches: [ development, main ]
-  pull_request:
-    branches: [ development, main ]
 
 jobs:
   build:
@@ -18,9 +16,12 @@ jobs:
     #  run: composer validate --strict
 
 
-    - name: Install dependencies
+    - name: Install PHP dependencies
       run: composer install --prefer-dist --no-progress
 
+    #- name: Install Node dependencies
+    #  run: npm install --production
+    
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
