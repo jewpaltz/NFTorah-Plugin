@@ -52,6 +52,7 @@ const formVue = new Vue({
         activePaymentTab: "1",
         isSaved: false,
         isLoading: false,
+        validationMessages: [],
         purchase: new Purchase(),
         route: window.location.hash,
 
@@ -99,10 +100,17 @@ const formVue = new Vue({
         },
 
         isValid(){
+            this.validationMessages = [];
             if(!this.$refs.form.checkValidity()){
                 for (const field of this.$refs.form) {
                     if(field.blur){
                         field.dispatchEvent(new Event('blur'));
+                    }
+                    if(field.validity.valueMissing){
+                        field.setCustomValidity("is required")
+                        console.log(field);
+                        let section = field.closest("[section]")?.getAttribute("section");
+                        this.validationMessages.push({ section, name: field.name, msg: field.validationMessage })
                     }
                 }
                 this.$refs.form.reportValidity();

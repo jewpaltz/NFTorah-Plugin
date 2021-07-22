@@ -2,6 +2,13 @@
 <div id="postbox" :class="{ loaded: true }">
     <form id="purchase-form" ref="form" method="post" @submit.prevent="" v-if="page == 1">
         <h3 class="title is-3"> Purchase a letter </h3>
+        <ul v-if="validationMessages.length" class="has-text-danger">
+            <h5  class="has-text-danger header is-5">There are some details that need your attention:</h5>
+            <li v-for="e in validationMessages" :key="e.name">
+                <b v-show="e.section">{{e.section}}'s </b>
+                {{e.name}} {{e.msg}}
+            </li>
+        </ul>
         <b-tabs v-model="activeItemTab">
             <b-tab-item label="Individual Letters" value="1">
                 <?php include __DIR__ . '/letters-form.php'; ?>
@@ -9,7 +16,6 @@
             <b-tab-item value="2">
                 <template slot="header">
                     Verses & Sections
-                    <img class="icon" style="height: 20px; width: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
                 </template>
                 <?php include __DIR__ . '/verses.php'; ?>
             </b-tab-item>
@@ -33,25 +39,25 @@
             </div>
         </div>
 
-        <div class="box">
+        <div class="box" section="Billing info.">
             <small><b>Information of person paying:</b></small>
             <div class="columns" style="margin-bottom: .75rem;">
                 <div class="column" style="padding-bottom: 0;">
                     <b-field label="First Name *" label-position="inside">
-                            <b-input v-model="purchase.firstName" id="firstName" required></b-input>
+                            <b-input v-model="purchase.firstName" name="First Name" required></b-input>
                         </b-field>
                     </div>
                     <div class="column" style="padding-bottom: 0;">
                     <b-field label="Last Name *" label-position="inside">
-                        <b-input v-model="purchase.lastName" id="lastName" required></b-input>
+                        <b-input v-model="purchase.lastName" name="Last Name" required></b-input>
                     </b-field>
                 </div>
             </div>
             <b-field label="Email *" label-position="inside">
-                <b-input v-model="purchase.email" id="email" required></b-input>
+                <b-input v-model="purchase.email" name="Email" required></b-input>
             </b-field>
             <b-field label="Phone *" label-position="inside">
-                <b-input v-model="purchase.phone" id="phone" required></b-input>
+                <b-input v-model="purchase.phone" name="Phone" required></b-input>
             </b-field>
         </div>
 
@@ -80,10 +86,6 @@
         </div>
     </div>
 
-    <div class="notification is-warning is-light">
-        <img class="icon" style="height: 20px; width: 20px;" src="<?= plugins_url( 'NFTorah-plugin/assets/images/coming_soon.png' ) ?>" />
-        Feature not yet available. Coming Soon!
-    </div>
 </div>
 
 <style>
@@ -112,6 +114,10 @@
 
     .field .control, .field .help {
         margin: 0;
+    }
+
+    .is-compact .button.is-medium, .is-compact .input.is-medium {
+        padding-left: 9px; padding-right: 9px;
     }
 
     .b-tabs section.tab-content {
