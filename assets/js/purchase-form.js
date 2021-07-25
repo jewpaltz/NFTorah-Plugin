@@ -194,8 +194,12 @@ const formVue = new Vue({
                     vm.purchase.cardNumber = details.id;
                     vm.purchase.paymentMethodId = details.id;
                     vm.purchase.paid = vm.price;
-                    await vm.submitForm();
-                    await vm.mintToBurner();
+                    try {
+                        await vm.submitForm();
+                        await vm.mintToBurner();                        
+                    } catch (error) {
+                        vm.reportError(error, "PayPal");
+                    }
                 }
             }).render('#paypal-button-container'); // Display payment options on your web page
         },
@@ -307,7 +311,11 @@ const formVue = new Vue({
             const password = prompt("Choose a password");
             const json_wallet = await wallet.encrypt( password );
             this.json_wallet = 'data:text/plain;charset=utf-8,' + encodeURIComponent(json_wallet);
-        }
+        },
+        reportError(error, section = null){
+            const msg  = error.msg || error;
+            this.validationMessages.push({ section, name: "Error", msg: msg })
+        },
     },
     computed:{
         price(){ // paid
