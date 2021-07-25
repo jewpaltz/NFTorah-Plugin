@@ -150,14 +150,25 @@ public function create_item( $request ) {
 
 private function ConfirmPayPalPayment($purchase){
     global $logger;
+    //$access_token = getenv('PAYPAL_ACCESS_TOKEN');
 
-    $url = getenv('PAYPAL_API_ROOT') . 'checkout/orders/' . $purchase['paymentMethodId'];
-    $args = array(
-        'headers' => array(
-            'Authorization' => 'Bearer ' . getenv('PAYPAL_ACCESS_TOKEN'),
-        ),
-    );
+    $url = getenv('PAYPAL_API_ROOT') . 'v1/oauth2/token/';
+    $basicAuth = base64_encode( getenv('PAYPAL_CLIENT_ID') . ':' . getenv('PAYPAL_SECRET') );
+    $args = [
+        'headers' => [
+            'Authorization' => "Basic $basicAuth",
+        ],
+        'body' => 'grant_type=client_credentials',
+    ];    
+    $response = wp_remote_post( $url, $args );
+    $auth = json_decode( wp_remote_retrieve_body($response), true );
     
+    $url = getenv('PAYPAL_API_ROOT') . 'v2/checkout/orders/' . $purchase['paymentMethodId'];
+    $args = [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $auth['access_token'],
+        ],
+    ];    
     $response = wp_remote_get( $url, $args );
     $paypalPayment = json_decode( wp_remote_retrieve_body($response), true );
     
