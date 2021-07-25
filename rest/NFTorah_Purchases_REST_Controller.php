@@ -1,5 +1,11 @@
 <?php
 
+/*  TODO:
+    - Monolog\Logger::debug() must be of the type array, null given
+    - Make sure errors are reported to user
+    - Letters Quantity
+    - Publish the oAuth changes
+*/
 use Monolog\Logger;
 use NFTorah\Purchases;
 
@@ -173,7 +179,7 @@ private function ConfirmPayPalPayment($purchase){
     $paypalPayment = json_decode( wp_remote_retrieve_body($response), true );
     
     if($paypalPayment['status'] != 'COMPLETED'){
-        $logger->debug('Paypal: Transaction failed', $paypalPayment);
+        $logger->debug('Paypal: Transaction failed', $purchase);
         throw new Exception('The Paypal transaction did not go through properly');
     }
 

@@ -178,6 +178,7 @@ const formVue = new Vue({
                       amount: { value: vm.price },
                       description: vm.letters.length + " letters in a special Torah Scroll",
                       soft_descriptor: "NFTorah Letters",
+                      quantity: vm.letters.length
                     }],
                     application_context: {
                         shipping_preference: 'NO_SHIPPING',
