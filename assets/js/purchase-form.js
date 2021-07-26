@@ -13,9 +13,12 @@ const PROPER_CHAIN_ID = 4;  // Rinkeby
 const PROPER_CHAIN_NAME = 'rinkeby';
 const minter_wallet = new ethers.Wallet(privateKey, provider);
 
-window.ethereum.on('networkChanged', function(networkId){
-    console.log('networkChanged',networkId);
-  });
+if(window.ethereum){
+    window.ethereum.on('networkChanged', function(networkId){
+        console.log('networkChanged',networkId);
+    });
+}
+
 
 class Letter {
     hebrewName = "";
